@@ -218,13 +218,8 @@ def main() -> None:
         compute_metrics=compute_metrics,
     )
 
-    print("Starting training...")
     trainer.train()
-    print("Training finished.")
-
-    print("Running evaluation...")
     metrics = trainer.evaluate()
-    print("Evaluation metrics:", metrics)
 
     model.save_pretrained("./t5_lora_peft_output")
     tokenizer.save_pretrained("./t5_lora_peft_output")
