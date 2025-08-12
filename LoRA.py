@@ -46,7 +46,7 @@ def main() -> None:
     train_dataset, eval_dataset = split["train"], split["test"]
 
     train_dataset = train_dataset.select(range(20000))
-    eval_dataset = eval_dataset.select(range(min(2000))
+    eval_dataset = eval_dataset.select(range(min(2000)))
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = None, None, False
