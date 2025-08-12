@@ -66,8 +66,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(325000))  # first 325000 samples
-    eval_dataset = eval_dataset.select(range(32500))    # first 32500 samples
+    train_dataset = train_dataset.select(range(50000))  # first 325000 samples
+    eval_dataset = eval_dataset.select(range(5000))    # first 32500 samples
 
 
     # Infer source/target fields
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
