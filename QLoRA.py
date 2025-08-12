@@ -182,7 +182,7 @@ def main() -> None:
         eval_steps = 8,
         optim="paged_adamw_8bit",
         tf32=True,
-        fp16=torch.cuda.is_available(),
+        bf16=torch.cuda.is_available(),
         lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
