@@ -12,13 +12,13 @@ import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="flan-t5-base-lang8",  # your project name
-    name="first-run",               # run name
+    project="t5-large-qlora",  # your project name
+    name="qlora-run",               # run name
 )
 
 def main() -> None:
-    # Model: Qwen 0.5B Instruct
-    model_name = "google/flan-t5-base"
+    # Model: T5-large
+    model_name = "t5-large"
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
@@ -66,8 +66,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(250000))  # first 100000 samples
-    eval_dataset = eval_dataset.select(range(25000))    # first 10000 samples
+    train_dataset = train_dataset.select(range(250000))  # first 250000 samples
+    eval_dataset = eval_dataset.select(range(25000))    # first 25000 samples
 
 
     # Infer source/target fields
@@ -172,10 +172,10 @@ def main() -> None:
         per_device_eval_batch_size=2,
         gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
         gradient_checkpointing=True,
-        max_steps = 20,
-        num_train_epochs=1, #change to 3 later
-        learning_rate=2.5e-5, #halved
-        warmup_ratio = 0.04,
+        max_steps = 60,
+        num_train_epochs=2, #change to 3 later
+        learning_rate=2e-4, #halved
+        warmup_ratio = 0.05,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
         eval_strategy="steps",
@@ -207,6 +207,14 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
+
+
+
+
+
+
+
 
 
 
