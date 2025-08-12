@@ -162,7 +162,8 @@ def main() -> None:
         per_device_eval_batch_size=2,
         gradient_accumulation_steps=4,
         eval_strategy="steps",
-        eval_steps=8,  # Evaluate every 8 steps
+        eval_steps=8, 
+        save_steps=8,# Evaluate every 8 steps
         max_steps=25,
         num_train_epochs=1,
         learning_rate=2e-4,
