@@ -170,7 +170,7 @@ def main() -> None:
         warmup_ratio=0.05,
         logging_steps=2,
         save_total_limit=2,
-        fp16=torch.cuda.is_available(),
+        bf16=torch.cuda.is_available(),
         optim="adamw_torch",
         report_to=["wandb"],
         logging_dir="./logs",
