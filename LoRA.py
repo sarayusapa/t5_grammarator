@@ -145,7 +145,7 @@ def main() -> None:
         return preds, labels
 
     def compute_metrics(eval_preds):
-    preds, labels = eval_preds
+        preds, labels = eval_preds
     if isinstance(preds, tuple):
         preds = preds[0]
     # Convert preds to tensor if not already
