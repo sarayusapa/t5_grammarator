@@ -45,6 +45,9 @@ def main() -> None:
     split = base_train.train_test_split(test_size=0.01, seed=42)
     train_dataset, eval_dataset = split["train"], split["test"]
 
+    train_dataset = train_dataset.select(range(20000))
+    eval_dataset = eval_dataset.select(range(min(2000))
+
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = None, None, False
     candidates = [
