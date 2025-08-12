@@ -12,13 +12,13 @@ import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 
 wandb.init(
-    project="qlora-qwen0.5b-lang8",  # your project name
+    project="flan-t5-base-lang8",  # your project name
     name="first-run",               # run name
 )
 
 def main() -> None:
     # Model: Qwen 0.5B Instruct
-    model_name = "Qwen/Qwen2-0.5B-Instruct"
+    model_name = "google/flan-t5-base"
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
@@ -168,14 +168,14 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./",
-        per_device_train_batch_size=1,
+        per_device_train_batch_size=2,
         per_device_eval_batch_size=1,
         gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
         gradient_checkpointing=True,
         max_steps = 20,
         num_train_epochs=0.1, #change to 3 later
-        learning_rate=1.55e-4, #halved
-        warmup_ratio = 0.015,
+        learning_rate=1.5e-4, #halved
+        warmup_ratio = 0.03,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
         eval_strategy="steps",
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
