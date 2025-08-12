@@ -2,23 +2,23 @@ import torch
 from datasets import load_dataset
 from transformers import (
     AutoTokenizer,
-    AutoModelForCausalLM,
+    AutoModelForSeq2SeqLM,
     BitsAndBytesConfig,
     Trainer,
     TrainingArguments,
     default_data_collator,
 )
 import wandb
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="qlora-qwen0.5b-lang8",  # your project name
+    project="flan-t5-base-lang8",  # your project name
     name="first-run",               # run name
 )
 
 def main() -> None:
     # Model: Qwen 0.5B Instruct
-    model_name = "Qwen/Qwen2-0.5B-Instruct"
+    model_name = "google/flan-t5-base"
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
@@ -34,7 +34,7 @@ def main() -> None:
     )
 
     # Base model in 4-bit
-    model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForSeq2SeqLM.from_pretrained(
         model_name,
         quantization_config=bnb_config,
         device_map="auto",
@@ -43,12 +43,12 @@ def main() -> None:
     # Prepare for k-bit training and apply LoRA
     model = prepare_model_for_kbit_training(model)
     lora_config = LoraConfig(
-        r=16,
+        r=8,
         lora_alpha=32,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        target_modules=["q", "v"],
         lora_dropout=0.05,
         bias="none",
-        task_type="CAUSAL_LM",
+        task_type=TaskType.SEQ_2_SEQ_LM,
     )
     model = get_peft_model(model, lora_config)
     # Disable cache for training to reduce memory and enable checkpointing compatibility
@@ -56,7 +56,7 @@ def main() -> None:
         model.config.use_cache = False
 
     # Dataset: Lang-8 on HF Hub
-    ds = load_dataset("MohamedAshraf701/lang-8")
+    ds = load_dataset("Hritshhh/T5-Dataset")
 
     # Choose a train split; create a small eval from it if no dedicated split
     split_name = "train" if "train" in ds else list(ds.keys())[0]
@@ -66,8 +66,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(50))  # first 50 samples
-    eval_dataset = eval_dataset.select(range(10))    # first 10 samples
+    train_dataset = train_dataset.select(range(250000))  # first 100000 samples
+    eval_dataset = eval_dataset.select(range(25000))    # first 10000 samples
 
 
     # Infer source/target fields
@@ -80,6 +80,7 @@ def main() -> None:
         ("sentence", "corrections", True),
         ("input", "output", False),
         ("processed_input", "processed_output", False),
+        ("input_text", "target_text", False),
     ]
     for s, t, is_list in candidates:
         if s in feature_names and t in feature_names:
@@ -167,20 +168,21 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./",
-        per_device_train_batch_size=1,
-        per_device_eval_batch_size=1,
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=2,
         gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
         gradient_checkpointing=True,
         max_steps = 20,
-        num_train_epochs=0.1, #change to 3 later
-        learning_rate=2e-5, #halved
-        logging_steps=1, #change to 10 later
+        num_train_epochs=1, #change to 3 later
+        learning_rate=2.5e-5, #halved
+        warmup_ratio = 0.04,
+        logging_steps=2, #change to 10 later
         save_strategy="epoch",
         eval_strategy="steps",
-        eval_steps = 5,
+        eval_steps = 8,
         optim="paged_adamw_8bit",
         tf32=True,
-        fp16=torch.cuda.is_available(),
+        bf16=torch.cuda.is_available(),
         lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
@@ -191,15 +193,50 @@ def main() -> None:
         train_dataset=tokenized_train,
         tokenizer=tokenizer,
         data_collator=data_collator,
+        eval_dataset = tokenized_eval,
     )
 
     trainer.train()
 
     # Save LoRA adapters and tokenizer
-    save_dir = "./qlora-qwen0.5b-lang8"
+    save_dir = "./qlora-flan-t5-base-lang8"
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 
 
 if __name__ == "__main__":
+
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
