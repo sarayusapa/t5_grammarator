@@ -163,7 +163,7 @@ def main() -> None:
         gradient_accumulation_steps=4,
         eval_strategy="steps",
         eval_steps=8, 
-        save_steps=8,# Evaluate every 8 steps
+        save_steps=8,
         max_steps=25,
         num_train_epochs=1,
         learning_rate=2e-4,
