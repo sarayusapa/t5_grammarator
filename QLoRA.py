@@ -66,8 +66,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(40000))  # first 50 samples
-    eval_dataset = eval_dataset.select(range(4000))    # first 10 samples
+    train_dataset = train_dataset.select(range(325000))  # first 325000 samples
+    eval_dataset = eval_dataset.select(range(32500))    # first 32500 samples
 
 
     # Infer source/target fields
@@ -174,8 +174,8 @@ def main() -> None:
         gradient_checkpointing=True,
         max_steps = 20,
         num_train_epochs=1, #change to 3 later
-        learning_rate=1e-4, #halved
-        warmup_ratio = 0.03,
+        learning_rate=1.25e-4, #halved
+        warmup_ratio = 0.02,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
         eval_strategy="steps",
@@ -183,7 +183,7 @@ def main() -> None:
         optim="paged_adamw_8bit",
         tf32=True,
         bf16=torch.cuda.is_available(),
-        lr_scheduler_type="linear", #scales loss function updation based on current value of loss function
+        lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
 
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
