@@ -1,4 +1,4 @@
-from datasets import Dataset, load_dataset, concatenate_datasets
+from datasets import Dataset, load_dataset, concatenate_datasets, load_from_disk
 import pandas as pd
 from transformers import T5Tokenizer
 clean_lines = []
@@ -43,5 +43,7 @@ def preprocess(examples):
 def is_valid_example(example):
     return isinstance(example["input_text"], str) and isinstance(example["target_text"], str)
 combined_data = combined_data.filter(is_valid_example)
+repo_name = "Hritshhh/T5-Dataset"
+combined_data.push_to_hub(repo_name,private=False)
 tokenized_dataset = combined_data.map(preprocess, batched = True, remove_columns = ["input_text","target_text"])
 tokenized_dataset.save_to_disk("./tokenized_grammar_data")
