@@ -12,13 +12,13 @@ import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="t5-base-lang8",  # your project name
+    project="t5-large-lang8",  # your project name
     name="first-run",               # run name
 )
 
 def main() -> None:
-    # Model: T5-base
-    model_name = "t5-base"
+    # Model: T5-large
+    model_name = "t5-lsarge"
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
