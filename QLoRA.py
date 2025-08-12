@@ -45,7 +45,7 @@ def main() -> None:
     lora_config = LoraConfig(
         r=16,
         lora_alpha=32,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        target_modules=["q", "v"],
         lora_dropout=0.05,
         bias="none",
         task_type=TaskType.SEQ_2_SEQ_LM,
@@ -182,7 +182,7 @@ def main() -> None:
         eval_steps = 8,
         optim="paged_adamw_8bit",
         tf32=True,
-        fp16=torch.cuda.is_available(),
+        bf16=torch.cuda.is_available(),
         lr_scheduler_type="linear", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
@@ -199,7 +199,7 @@ def main() -> None:
     trainer.train()
 
     # Save LoRA adapters and tokenizer
-    save_dir = "./qlora-qwen0.5b-lang8"
+    save_dir = "./qlora-flan-t5-base-lang8"
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
