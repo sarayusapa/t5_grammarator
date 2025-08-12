@@ -172,7 +172,7 @@ def main() -> None:
         per_device_eval_batch_size=2,
         gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
         gradient_checkpointing=True,
-        gradient_clip_value = 0.1,
+        gradient_clip_norm = 0.1,
         max_steps = 20,
         num_train_epochs=1, #change to 3 later
         learning_rate=1e-5, #halved
