@@ -144,8 +144,8 @@ def main() -> None:
         labels = [[label.strip()] for label in labels]  # BLEU expects list of references per prediction
         return preds, labels
 
-    def compute_metrics(eval_preds):
-        preds, labels = eval_preds
+def compute_metrics(eval_preds):
+    preds, labels = eval_preds
     if isinstance(preds, tuple):
         preds = preds[0]
     # Convert preds to tensor if not already
@@ -167,6 +167,7 @@ def main() -> None:
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
     result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
     return {"bleu": result["bleu"]}
+
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./t5_lora_peft_output",
