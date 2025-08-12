@@ -136,7 +136,6 @@ def main() -> None:
             "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
         }
 
-    # Load BLEU metric
     bleu = evaluate.load("bleu")
 
     def postprocess_text(preds, labels):
@@ -144,30 +143,29 @@ def main() -> None:
         labels = [[label.strip()] for label in labels]  # BLEU expects list of references per prediction
         return preds, labels
 
-def compute_metrics(eval_preds):
-    preds, labels = eval_preds
-    if isinstance(preds, tuple):
-        preds = preds[0]
-    # Convert preds to tensor if not already
-    if not isinstance(preds, torch.Tensor):
-        preds = torch.tensor(preds)
-    # If preds are logits (float), convert to token ids
-    if preds.dtype != torch.int64:
-        preds = preds.argmax(dim=-1)
-    # Move to CPU numpy array
-    preds = preds.detach().cpu().numpy()
-    # Similarly convert labels to numpy array if tensor
-    if isinstance(labels, torch.Tensor):
-        labels = labels.detach().cpu().numpy()
-    # Decode preds
-    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-    # Replace -100 in labels with pad token id for decoding
-    labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
-    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-    decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
-    result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
-    return {"bleu": result["bleu"]}
-
+    def compute_metrics(eval_preds):
+        preds, labels = eval_preds
+        if isinstance(preds, tuple):
+            preds = preds[0]
+        # Convert preds to tensor if not already
+        if not isinstance(preds, torch.Tensor):
+            preds = torch.tensor(preds)
+        # If preds are logits (float), convert to token ids
+        if preds.dtype != torch.int64:
+            preds = preds.argmax(dim=-1)
+        # Move to CPU numpy array
+        preds = preds.detach().cpu().numpy()
+        # Similarly convert labels to numpy array if tensor
+        if isinstance(labels, torch.Tensor):
+            labels = labels.detach().cpu().numpy()
+        # Decode preds
+        decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+        # Replace -100 in labels with pad token id for decoding
+        labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
+        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+        decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+        result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
+        return {"bleu": result["bleu"]}
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./t5_lora_peft_output",
@@ -206,7 +204,13 @@ def compute_metrics(eval_preds):
         compute_metrics=compute_metrics,
     )
 
+    print("Starting training...")
     trainer.train()
+    print("Training finished.")
+
+    print("Running evaluation...")
+    metrics = trainer.evaluate()
+    print("Evaluation metrics:", metrics)
 
     model.save_pretrained("./t5_lora_peft_output")
     tokenizer.save_pretrained("./t5_lora_peft_output")
