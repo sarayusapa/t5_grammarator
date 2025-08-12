@@ -48,7 +48,7 @@ def main() -> None:
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
         lora_dropout=0.05,
         bias="none",
-        task_type="Seq2Seq_LM",
+        task_type=TaskType.SEQ_2_Seq_LM,
     )
     model = get_peft_model(model, lora_config)
     # Disable cache for training to reduce memory and enable checkpointing compatibility
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
