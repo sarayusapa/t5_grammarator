@@ -145,22 +145,28 @@ def main() -> None:
         return preds, labels
 
     def compute_metrics(eval_preds):
-        preds, labels = eval_preds
-        if isinstance(preds, tuple):
-            preds = preds[0]
-        if isinstance(preds, torch.Tensor) and preds.dtype != torch.int64:
-            preds = preds.argmax(dim=-1)
-        if isinstance(preds, torch.Tensor):
-            preds = preds.detach().cpu().numpy()
-        if isinstance(labels, torch.Tensor):
-            labels = labels.detach().cpu().numpy()    
-        decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-        # Replace -100 in the labels as pad token id to decode properly
-        labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
-        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-        decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
-        result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
-        return {"bleu": result["bleu"]}
+    preds, labels = eval_preds
+    if isinstance(preds, tuple):
+        preds = preds[0]
+    # Convert preds to tensor if not already
+    if not isinstance(preds, torch.Tensor):
+        preds = torch.tensor(preds)
+    # If preds are logits (float), convert to token ids
+    if preds.dtype != torch.int64:
+        preds = preds.argmax(dim=-1)
+    # Move to CPU numpy array
+    preds = preds.detach().cpu().numpy()
+    # Similarly convert labels to numpy array if tensor
+    if isinstance(labels, torch.Tensor):
+        labels = labels.detach().cpu().numpy()
+    # Decode preds
+    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+    # Replace -100 in labels with pad token id for decoding
+    labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
+    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+    decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+    result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
+    return {"bleu": result["bleu"]}
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./t5_lora_peft_output",
