@@ -170,12 +170,12 @@ def main() -> None:
         output_dir="./",
         per_device_train_batch_size=8,
         per_device_eval_batch_size=2,
-        gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
+        gradient_accumulation_steps=16, #doubled to half the parameter updation frequency
         gradient_checkpointing=True,
         max_steps = 20,
-        num_train_epochs=1, #change to 3 later
-        learning_rate=2e-5, #halved
-        warmup_ratio = 0.04,
+        num_train_epochs=2, #change to 3 later
+        learning_rate=1e-5, #halved
+        warmup_ratio = 0.05,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
         eval_strategy="steps",
@@ -183,7 +183,7 @@ def main() -> None:
         optim="paged_adamw_8bit",
         tf32=True,
         bf16=torch.cuda.is_available(),
-        lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
+        lr_scheduler_type="linear", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
 
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
