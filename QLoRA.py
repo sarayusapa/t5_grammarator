@@ -66,8 +66,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(50000))  # first 325000 samples
-    eval_dataset = eval_dataset.select(range(5000))    # first 32500 samples
+    train_dataset = train_dataset.select(range(750000))  # first 325000 samples
+    eval_dataset = eval_dataset.select(range(7500))    # first 32500 samples
 
 
     # Infer source/target fields
@@ -174,8 +174,8 @@ def main() -> None:
         gradient_checkpointing=True,
         max_steps = 20,
         num_train_epochs=1, #change to 3 later
-        learning_rate=1e-4, #halved
-        warmup_ratio = 0.02,
+        learning_rate=0.9e-4, #halved
+        warmup_ratio = 0.03,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
         eval_strategy="steps",
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
