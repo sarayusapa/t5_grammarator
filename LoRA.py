@@ -168,7 +168,7 @@ def main() -> None:
         num_train_epochs=1,
         learning_rate=2e-4,
         warmup_ratio=0.05,
-        logging_steps=50,
+        logging_steps=2,
         save_total_limit=2,
         fp16=torch.cuda.is_available(),
         optim="adamw_torch",
