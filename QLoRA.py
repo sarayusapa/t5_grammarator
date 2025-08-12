@@ -18,7 +18,7 @@ wandb.init(
 
 def main() -> None:
     # Model: T5-large
-    model_name = "t5-lsarge"
+    model_name = "t5-large"
 
     # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
