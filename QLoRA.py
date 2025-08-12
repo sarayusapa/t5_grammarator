@@ -2,7 +2,7 @@ import torch
 from datasets import load_dataset
 from transformers import (
     AutoTokenizer,
-    AutoModelForCausalLM,
+    AutoModelForSeq2SeqLM,
     BitsAndBytesConfig,
     Trainer,
     TrainingArguments,
@@ -34,7 +34,7 @@ def main() -> None:
     )
 
     # Base model in 4-bit
-    model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForSeq2SeqLM.from_pretrained(
         model_name,
         quantization_config=bnb_config,
         device_map="auto",
@@ -48,7 +48,7 @@ def main() -> None:
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
         lora_dropout=0.05,
         bias="none",
-        task_type="CAUSAL_LM",
+        task_type="Seq2Seq_LM",
     )
     model = get_peft_model(model, lora_config)
     # Disable cache for training to reduce memory and enable checkpointing compatibility
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
