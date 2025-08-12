@@ -174,15 +174,15 @@ def main() -> None:
         gradient_checkpointing=True,
         max_steps = 20,
         num_train_epochs=1, #change to 3 later
-        learning_rate=0.5e-4, #halved
-        warmup_ratio = 0.02,
+        learning_rate=0.25e-4, #halved
+        warmup_ratio = 0.015,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
         eval_strategy="steps",
         eval_steps = 8,
         optim="paged_adamw_8bit",
         tf32=True,
-        bf16=torch.cuda.is_available(),
+        fp16=torch.cuda.is_available(),
         lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
