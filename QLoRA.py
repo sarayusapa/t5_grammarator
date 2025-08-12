@@ -168,13 +168,13 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./",
-        per_device_train_batch_size=2,
-        per_device_eval_batch_size=1,
+        per_device_train_batch_size=4,
+        per_device_eval_batch_size=2,
         gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
         gradient_checkpointing=True,
         max_steps = 20,
-        num_train_epochs=0.1, #change to 3 later
-        learning_rate=1.5e-4, #halved
+        num_train_epochs=1, #change to 3 later
+        learning_rate=1e-4, #halved
         warmup_ratio = 0.03,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
