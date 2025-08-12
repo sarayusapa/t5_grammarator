@@ -148,6 +148,12 @@ def main() -> None:
         preds, labels = eval_preds
         if isinstance(preds, tuple):
             preds = preds[0]
+        if isinstance(preds, torch.Tensor) and preds.dtype != torch.int64:
+            preds = preds.argmax(dim=-1)
+        if isinstance(preds, torch.Tensor):
+            preds = preds.detach().cpu().numpy()
+        if isinstance(labels, torch.Tensor):
+            labels = labels.detach().cpu().numpy()    
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
         # Replace -100 in the labels as pad token id to decode properly
         labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
@@ -164,7 +170,7 @@ def main() -> None:
         eval_strategy="steps",
         eval_steps=8, 
         save_steps=8,
-        max_steps=25,
+        max_steps=24,
         num_train_epochs=1,
         learning_rate=2e-4,
         warmup_ratio=0.05,
