@@ -174,7 +174,7 @@ def main() -> None:
         gradient_checkpointing=True,
         max_steps = 20,
         num_train_epochs=1, #change to 3 later
-        learning_rate=0.25e-4, #halved
+        learning_rate=1e-5, #halved
         warmup_ratio = 0.015,
         logging_steps=2, #change to 10 later
         save_strategy="epoch",
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
