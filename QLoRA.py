@@ -12,8 +12,8 @@ import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="t5-large-lang8",  # your project name
-    name="first-run",               # run name
+    project="t5-large-qlora",  # your project name
+    name="qlora-run",               # run name
 )
 
 def main() -> None:
@@ -66,8 +66,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(250000))  # first 100000 samples
-    eval_dataset = eval_dataset.select(range(25000))    # first 10000 samples
+    train_dataset = train_dataset.select(range(250000))  # first 250000 samples
+    eval_dataset = eval_dataset.select(range(25000))    # first 25000 samples
 
 
     # Infer source/target fields
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
