@@ -9,7 +9,7 @@ from transformers import (
     default_data_collator,
 )
 import wandb
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
     project="flan-t5-base-lang8",  # your project name
@@ -48,7 +48,7 @@ def main() -> None:
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
         lora_dropout=0.05,
         bias="none",
-        task_type=TaskType.SEQ_2_Seq_LM,
+        task_type=TaskType.SEQ_2_SEQ_LM,
     )
     model = get_peft_model(model, lora_config)
     # Disable cache for training to reduce memory and enable checkpointing compatibility
@@ -207,6 +207,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
