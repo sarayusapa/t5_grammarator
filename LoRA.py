@@ -160,7 +160,7 @@ def main() -> None:
         per_device_train_batch_size=8,
         per_device_eval_batch_size=2,
         gradient_accumulation_steps=4,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         eval_steps=8,
         save_steps=8,
         max_steps=24,
