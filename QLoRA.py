@@ -12,8 +12,8 @@ import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="t5-large-qlora",  # project name
-    name="qlora-run",               # run name
+    project="t5-large-qlora-full",  # project name
+    name="run1",               # run name
 )
 
 def main() -> None:
@@ -212,6 +212,7 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
 
