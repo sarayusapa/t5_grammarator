@@ -45,8 +45,8 @@ def main() -> None:
     split = base_train.train_test_split(test_size=0.01, seed=42)
     train_dataset, eval_dataset = split["train"], split["test"]
 
-    train_dataset = train_dataset.select(range(20000))
-    eval_dataset = eval_dataset.select(range(2000))
+    train_dataset = train_dataset.select(range(15000))
+    eval_dataset = eval_dataset.select(range(1500))
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = None, None, False
@@ -136,6 +136,7 @@ def main() -> None:
             "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
         }
 
+    # Load BLEU metric
     bleu = evaluate.load("bleu")
 
     def postprocess_text(preds, labels):
@@ -147,55 +148,28 @@ def main() -> None:
         preds, labels = eval_preds
         if isinstance(preds, tuple):
             preds = preds[0]
-
-    # Convert to tensor if not already
-        if not isinstance(preds, torch.Tensor):
-            preds = torch.tensor(preds)
-
-    # If preds are logits (float), get token ids by argmax
-        if preds.dtype != torch.int64:
-            preds = preds.argmax(dim=-1)
-
-    # Clamp preds to valid token ids range
-        vocab_size = tokenizer.vocab_size
-        preds = torch.clamp(preds, min=0, max=vocab_size - 1)
-
-    # Move to CPU numpy arrays
-        preds = preds.detach().cpu().numpy()
-        if isinstance(labels, torch.Tensor):
-            labels = labels.detach().cpu().numpy()
-
-    # Debug prints
-        print("Sample preds token ids:", preds[0][:10])
-        print("Sample labels token ids:", labels[0][:10])
-
-    # Replace -100 in labels with pad token id for decoding
-        labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
-
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
+        # Replace -100 in the labels as pad token id to decode properly
+        labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
         decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-
         decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
-
         result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
         return {"bleu": result["bleu"]}
-
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./t5_lora_peft_output",
         per_device_train_batch_size=8,
         per_device_eval_batch_size=2,
         gradient_accumulation_steps=4,
-        eval_strategy="steps",
-        eval_steps=8, 
-        save_steps=8,
-        max_steps=24,
+        evaluation_strategy="steps",
+        eval_steps=8,  # Evaluate every 8 steps
+        max_steps=25,
         num_train_epochs=1,
         learning_rate=2e-4,
         warmup_ratio=0.05,
-        logging_steps=2,
+        logging_steps=50,
         save_total_limit=2,
-        bf16=torch.cuda.is_available(),
+        fp16=torch.cuda.is_available(),
         optim="adamw_torch",
         report_to=["wandb"],
         logging_dir="./logs",
@@ -219,7 +193,6 @@ def main() -> None:
     )
 
     trainer.train()
-    metrics = trainer.evaluate()
 
     model.save_pretrained("./t5_lora_peft_output")
     tokenizer.save_pretrained("./t5_lora_peft_output")
