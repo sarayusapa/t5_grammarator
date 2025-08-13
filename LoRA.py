@@ -180,7 +180,7 @@ def main() -> None:
         eval_strategy="steps",
         eval_steps=8,
         save_steps=8,
-        max_steps=40,
+        max_steps=48,
         learning_rate=2.3e-4,
         warmup_ratio=0.03,
         logging_steps=2,
