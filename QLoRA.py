@@ -166,7 +166,7 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./t5_large_QL_checkpoints",
-        per_device_train_batch_size=8,
+        per_device_train_batch_size=4,
         per_device_eval_batch_size=4,
         gradient_accumulation_steps=16, 
         gradient_checkpointing=True,
@@ -213,6 +213,7 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
 
