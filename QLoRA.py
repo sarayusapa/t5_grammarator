@@ -166,10 +166,10 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./t5_large_QL_checkpoints",
-        per_device_train_batch_size=4,
+        per_device_train_batch_size=8,
         per_device_eval_batch_size=4,
-        gradient_accumulation_steps=8, 
-        gradient_checkpointing=False,
+        gradient_accumulation_steps=16, 
+        gradient_checkpointing=True,
         
         max_grad_norm=1.0,
         #max_steps = 90000,
@@ -179,10 +179,10 @@ def main() -> None:
         warmup_ratio = 0.05,
         logging_steps=500,
         save_strategy="steps",
-        save_steps=4500,
+        save_steps=3000,
         save_total_limit=3,
         eval_strategy="steps",
-        eval_steps = 1500,
+        eval_steps = 3000,
         optim="paged_adamw_8bit",
         tf32=True,
         fp16=True,
@@ -213,6 +213,7 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
 
