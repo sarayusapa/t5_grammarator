@@ -30,7 +30,7 @@ def main() -> None:
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
         bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_compute_dtype=torch.float16,
     )
 
     model = AutoModelForSeq2SeqLM.from_pretrained(
@@ -166,8 +166,8 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./t5_large_QL_checkpoints",
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
+        per_device_train_batch_size=1,
+        per_device_eval_batch_size=2,
         gradient_accumulation_steps=16, 
         gradient_checkpointing=True,
         
@@ -175,7 +175,7 @@ def main() -> None:
         #max_steps = 90000,
         num_train_epochs=2,
 
-        learning_rate=2e-4, 
+        learning_rate=1e-4, 
         warmup_ratio = 0.05,
         logging_steps=500,
         save_strategy="steps",
@@ -190,6 +190,8 @@ def main() -> None:
         lr_scheduler_type="cosine", 
         report_to=["wandb"],
         load_best_model_at_end = True,
+        dataloader_num_workers=4,          # speed up data loading
+        group_by_length=True,              # reduce padding waste
     )
 
     trainer = Trainer(
@@ -213,6 +215,7 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
 
