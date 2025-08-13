@@ -169,7 +169,7 @@ def main() -> None:
     training_args = TrainingArguments(
         output_dir="./",
         per_device_train_batch_size=8,
-        per_device_eval_batch_size=3,
+        per_device_eval_batch_size=4,
         gradient_accumulation_steps=8,
         gradient_checkpointing=True,
         num_train_epochs=2,
@@ -182,8 +182,8 @@ def main() -> None:
         eval_steps = 3000,
         optim="paged_adamw_8bit",
         tf32=True,
-        fp16=True,
-        bf16=False,
+        fp16=False,
+        bf16=True,
         lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
@@ -208,6 +208,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
