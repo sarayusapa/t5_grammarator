@@ -186,7 +186,7 @@ def main() -> None:
         optim="paged_adamw_8bit",
         tf32=True,
         fp16=True,
-        bf16=torch.cuda.is_available(),
+        bf16=False,
         lr_scheduler_type="cosine", 
         report_to=["wandb"],
         load_best_model_at_end = True,
@@ -213,6 +213,7 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
 
