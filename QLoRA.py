@@ -66,8 +66,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    #train_dataset = train_dataset.select(range(250000))  # first 100000 samples
-    #eval_dataset = eval_dataset.select(range(25000))    # first 10000 samples
+    train_dataset = train_dataset.select(range(1000))  # first 100000 samples
+    eval_dataset = eval_dataset.select(range(100))    # first 10000 samples
 
 
     # Infer source/target fields
@@ -110,8 +110,8 @@ def main() -> None:
                 "Output: "
             )
 
-            prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"]
-            target_ids = tokenizer(tgt_text, add_special_tokens=False)["input_ids"] + [
+            prompt_ids = tokenizer(prompt, add_special_tokens=False, truncation=True, max_length=128)["input_ids"]
+            target_ids = tokenizer(tgt_text, add_special_tokens=False, truncation=True, max_length=128)["input_ids"] + [
                 tokenizer.eos_token_id
             ]
 
@@ -168,9 +168,9 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./qlora_t5large_epochs",
-        per_device_train_batch_size=16,
+        per_device_train_batch_size=8,
         per_device_eval_batch_size=2,
-        gradient_accumulation_steps=8, 
+        gradient_accumulation_steps=4, 
         gradient_checkpointing=True,
         #max_steps = 60,
         num_train_epochs=2, 
@@ -184,8 +184,8 @@ def main() -> None:
         eval_steps = 3000,
         optim="paged_adamw_8bit",
         tf32=True,
-        fp16=False,
-        bf16=torch.cuda.is_available(),
+        fp16=True,
+        bf16=False,
         lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
@@ -210,6 +210,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
