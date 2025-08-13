@@ -179,7 +179,7 @@ def main() -> None:
         warmup_ratio = 0.05,
         logging_steps=100,
         save_strategy="steps",
-        save_steps=5000,
+        save_steps=4500,
         save_total_limit=3,
         eval_strategy="steps",
         eval_steps = 1500,
@@ -212,5 +212,6 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
