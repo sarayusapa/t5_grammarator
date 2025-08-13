@@ -8,12 +8,15 @@ from transformers import (
     TrainingArguments,
     default_data_collator,
 )
+
+torch.cuda.empty_cache()
+
 import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="t5-large-qlora",  # your project name
-    name="qlora-run",               # run name
+    project="t5-large-lang8",  # your project name
+    name="first-run",               # run name
 )
 
 def main() -> None:
@@ -66,8 +69,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(250000))  # first 250000 samples
-    eval_dataset = eval_dataset.select(range(25000))    # first 25000 samples
+    train_dataset = train_dataset.select(range(500000))  # first 100000 samples
+    eval_dataset = eval_dataset.select(range(5000))    # first 10000 samples
 
 
     # Infer source/target fields
@@ -168,21 +171,22 @@ def main() -> None:
     # Training
     training_args = TrainingArguments(
         output_dir="./",
-        per_device_train_batch_size=8,
-        per_device_eval_batch_size=2,
-        gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
+        per_device_train_batch_size=4,
+        per_device_eval_batch_size=4,
+        gradient_accumulation_steps=8,
         gradient_checkpointing=True,
-        max_steps = 60,
-        num_train_epochs=2, #change to 3 later
-        learning_rate=2e-4, #halved
+        num_train_epochs=2,
+        learning_rate=2e-4, 
         warmup_ratio = 0.05,
-        logging_steps=2, #change to 10 later
-        save_strategy="epoch",
+        logging_steps=100,
+        save_strategy="steps",
+        save_steps=3000,
         eval_strategy="steps",
-        eval_steps = 8,
+        eval_steps = 3000,
         optim="paged_adamw_8bit",
         tf32=True,
-        bf16=torch.cuda.is_available(),
+        fp16=False,
+        bf16=True,
         lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
     )
@@ -207,6 +211,12 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
+
+
+
+
+
 
 
 

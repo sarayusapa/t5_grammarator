@@ -45,8 +45,8 @@ def main() -> None:
     split = base_train.train_test_split(test_size=0.01, seed=42)
     train_dataset, eval_dataset = split["train"], split["test"]
 
-    train_dataset = train_dataset.select(range(20000))
-    eval_dataset = eval_dataset.select(range(2000))
+    train_dataset = train_dataset.select(range(50000))
+    eval_dataset = eval_dataset.select(range(5000))
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = None, None, False
@@ -135,7 +135,7 @@ def main() -> None:
             "labels": torch.tensor(labels, dtype=torch.long),
             "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
         }
-
+        
     bleu = evaluate.load("bleu")
 
     def postprocess_text(preds, labels):
@@ -148,34 +148,25 @@ def main() -> None:
         if isinstance(preds, tuple):
             preds = preds[0]
 
-    # Convert to tensor if not already
-        if not isinstance(preds, torch.Tensor):
-            preds = torch.tensor(preds)
+    # Ensure preds is int32 and in vocab range
+        preds = torch.tensor(preds, dtype=torch.int32)
+        preds = torch.clamp(preds, 0, tokenizer.vocab_size - 1).tolist()
 
-    # If preds are logits (float), get token ids by argmax
-        if preds.dtype != torch.int64:
-            preds = preds.argmax(dim=-1)
-
-    # Clamp preds to valid token ids range
-        vocab_size = tokenizer.vocab_size
-        preds = torch.clamp(preds, min=0, max=vocab_size - 1)
-
-    # Move to CPU numpy arrays
-        preds = preds.detach().cpu().numpy()
-        if isinstance(labels, torch.Tensor):
-            labels = labels.detach().cpu().numpy()
-
-    # Debug prints
-        print("Sample preds token ids:", preds[0][:10])
-        print("Sample labels token ids:", labels[0][:10])
-
-    # Replace -100 in labels with pad token id for decoding
-        labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
-
+    # Decode preds safely
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
-        decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+    # Process labels: replace -100 with pad_token_id, ensure int32, clamp
+        safe_labels = []
+        for label in labels:
+            safe_label = [(l if l != -100 else tokenizer.pad_token_id) for l in label]
+            safe_label = torch.tensor(safe_label, dtype=torch.int32)
+            safe_label = torch.clamp(safe_label, 0, tokenizer.vocab_size - 1)
+            safe_labels.append(safe_label.tolist())
+        decoded_labels = tokenizer.batch_decode(safe_labels, skip_special_tokens=True)
+
+    # Strip and postprocess for BLEU
+        decoded_preds = [p.strip() for p in decoded_preds]
+        decoded_labels = [[l.strip()] for l in decoded_labels]  # BLEU expects list of references per prediction
 
         result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
         return {"bleu": result["bleu"]}
@@ -187,12 +178,11 @@ def main() -> None:
         per_device_eval_batch_size=2,
         gradient_accumulation_steps=4,
         eval_strategy="steps",
-        eval_steps=8, 
+        eval_steps=8,
         save_steps=8,
-        max_steps=24,
-        num_train_epochs=1,
-        learning_rate=2e-4,
-        warmup_ratio=0.05,
+        max_steps=48,
+        learning_rate=2.3e-4,
+        warmup_ratio=0.03,
         logging_steps=2,
         save_total_limit=2,
         bf16=torch.cuda.is_available(),
