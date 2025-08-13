@@ -45,8 +45,8 @@ def main() -> None:
     split = base_train.train_test_split(test_size=0.01, seed=42)
     train_dataset, eval_dataset = split["train"], split["test"]
 
-    train_dataset = train_dataset.select(range(15000))
-    eval_dataset = eval_dataset.select(range(1500))
+    train_dataset = train_dataset.select(range(25000))
+    eval_dataset = eval_dataset.select(range(2500))
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = None, None, False
@@ -164,9 +164,8 @@ def main() -> None:
         eval_steps=8,
         save_steps=8,
         max_steps=24,
-        num_train_epochs=1,
-        learning_rate=2e-4,
-        warmup_ratio=0.05,
+        learning_rate=2.2e-4,
+        warmup_ratio=0.04,
         logging_steps=2,
         save_total_limit=2,
         fp16=torch.cuda.is_available(),
