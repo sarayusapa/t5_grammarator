@@ -198,7 +198,7 @@ def main() -> None:
         model=model,
         args=training_args,
         train_dataset=tokenized_train,
-        tokenizer=tokenizer,
+        #tokenizer=tokenizer,
         data_collator=data_collator,
         eval_dataset = tokenized_eval,
     )
@@ -215,6 +215,7 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
 
