@@ -167,21 +167,24 @@ def main() -> None:
 
     # Training
     training_args = TrainingArguments(
-        output_dir="./",
-        per_device_train_batch_size=8,
+        output_dir="./qlora_t5large_epochs",
+        per_device_train_batch_size=16,
         per_device_eval_batch_size=2,
-        gradient_accumulation_steps=8, #doubled to half the parameter updation frequency
+        gradient_accumulation_steps=8, 
         gradient_checkpointing=True,
-        max_steps = 60,
-        num_train_epochs=2, #change to 3 later
-        learning_rate=2e-4, #halved
+        #max_steps = 60,
+        num_train_epochs=2, 
+        learning_rate=1e-4,
         warmup_ratio = 0.05,
-        logging_steps=2, #change to 10 later
-        save_strategy="epoch",
+        logging_steps=500,
+        save_strategy="steps",
+        save_steps=3000,
+        save_total_limit=3,
         eval_strategy="steps",
-        eval_steps = 8,
+        eval_steps = 3000,
         optim="paged_adamw_8bit",
         tf32=True,
+        fp16=False,
         bf16=torch.cuda.is_available(),
         lr_scheduler_type="cosine", #scales loss function updation based on current value of loss function
         report_to=["wandb"],
@@ -199,7 +202,7 @@ def main() -> None:
     trainer.train()
 
     # Save LoRA adapters and tokenizer
-    save_dir = "./qlora-flan-t5-base-lang8"
+    save_dir = "./qlora_t5base_model"
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 
@@ -207,6 +210,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
