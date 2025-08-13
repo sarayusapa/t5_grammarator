@@ -147,13 +147,30 @@ def main() -> None:
         preds, labels = eval_preds
         if isinstance(preds, tuple):
             preds = preds[0]
+
+    # Ensure preds is int32 and in vocab range
+        preds = torch.tensor(preds, dtype=torch.int32)
+        preds = torch.clamp(preds, 0, tokenizer.vocab_size - 1).tolist()
+
+    # Decode preds safely
         decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-        # Replace -100 in the labels as pad token id to decode properly
-        labels = [[(l if l != -100 else tokenizer.pad_token_id) for l in label] for label in labels]
-        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-        decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+
+    # Process labels: replace -100 with pad_token_id, ensure int32, clamp
+        safe_labels = []
+        for label in labels:
+            safe_label = [(l if l != -100 else tokenizer.pad_token_id) for l in label]
+            safe_label = torch.tensor(safe_label, dtype=torch.int32)
+            safe_label = torch.clamp(safe_label, 0, tokenizer.vocab_size - 1)
+            safe_labels.append(safe_label.tolist())
+        decoded_labels = tokenizer.batch_decode(safe_labels, skip_special_tokens=True)
+
+    # Strip and postprocess for BLEU
+        decoded_preds = [p.strip() for p in decoded_preds]
+        decoded_labels = [[l.strip()] for l in decoded_labels]  # BLEU expects list of references per prediction
+
         result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
         return {"bleu": result["bleu"]}
+
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./t5_lora_peft_output",
