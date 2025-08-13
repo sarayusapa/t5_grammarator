@@ -168,8 +168,8 @@ def main() -> None:
         output_dir="./t5_large_QL_checkpoints",
         per_device_train_batch_size=4,
         per_device_eval_batch_size=4,
-        gradient_accumulation_steps=4, 
-        gradient_checkpointing=True,
+        gradient_accumulation_steps=8, 
+        gradient_checkpointing=False,
         
         max_grad_norm=1.0,
         #max_steps = 90000,
@@ -177,7 +177,7 @@ def main() -> None:
 
         learning_rate=2e-4, 
         warmup_ratio = 0.05,
-        logging_steps=200,
+        logging_steps=500,
         save_strategy="steps",
         save_steps=4500,
         save_total_limit=3,
@@ -213,6 +213,7 @@ if __name__ == "__main__":
 
     main()
     
+
 
 
 
