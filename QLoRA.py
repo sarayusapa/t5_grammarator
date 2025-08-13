@@ -167,22 +167,28 @@ def main() -> None:
     training_args = TrainingArguments(
         output_dir="./t5_large_QL_checkpoints",
         per_device_train_batch_size=8,
-        per_device_eval_batch_size=2,
-        gradient_accumulation_steps=8, 
+        per_device_eval_batch_size=4,
+        gradient_accumulation_steps=4, 
         gradient_checkpointing=True,
-        max_steps = 90000,
+        
+        max_grad_norm=1.0,
+        #max_steps = 90000,
         num_train_epochs=2,
+
         learning_rate=2e-4, 
         warmup_ratio = 0.05,
-        logging_steps=2,
-        save_strategy="epoch",
+        logging_steps=100,
+        save_strategy="steps",
+        save_steps=5000,
+        save_total_limit=3,
         eval_strategy="steps",
-        eval_steps = 8,
+        eval_steps = 1500,
         optim="paged_adamw_8bit",
         tf32=True,
         bf16=torch.cuda.is_available(),
         lr_scheduler_type="cosine", 
         report_to=["wandb"],
+        load_best_model_at_end = True,
     )
 
     trainer = Trainer(
@@ -206,4 +212,5 @@ if __name__ == "__main__":
 
     main()
     
+
 
