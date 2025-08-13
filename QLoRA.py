@@ -169,14 +169,13 @@ def main() -> None:
     training_args = TrainingArguments(
         output_dir="./",
         per_device_train_batch_size=8,
-        per_device_eval_batch_size=2,
+        per_device_eval_batch_size=3,
         gradient_accumulation_steps=8,
         gradient_checkpointing=True,
-        max_steps = 60,
         num_train_epochs=2,
         learning_rate=2e-4, 
         warmup_ratio = 0.05,
-        logging_steps=500,
+        logging_steps=100,
         save_strategy="steps",
         save_steps=3000,
         eval_strategy="steps",
@@ -209,6 +208,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
