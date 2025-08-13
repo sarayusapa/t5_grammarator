@@ -135,8 +135,7 @@ def main() -> None:
             "labels": torch.tensor(labels, dtype=torch.long),
             "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
         }
-
-    # Load BLEU metric
+        
     bleu = evaluate.load("bleu")
 
     def postprocess_text(preds, labels):
@@ -162,12 +161,13 @@ def main() -> None:
         per_device_eval_batch_size=2,
         gradient_accumulation_steps=4,
         evaluation_strategy="steps",
-        eval_steps=8,  # Evaluate every 8 steps
-        max_steps=25,
+        eval_steps=8,
+        save_steps=8,
+        max_steps=24,
         num_train_epochs=1,
         learning_rate=2e-4,
         warmup_ratio=0.05,
-        logging_steps=50,
+        logging_steps=2,
         save_total_limit=2,
         fp16=torch.cuda.is_available(),
         optim="adamw_torch",
@@ -193,6 +193,7 @@ def main() -> None:
     )
 
     trainer.train()
+    metrics = trainer.evaluate()
 
     model.save_pretrained("./t5_lora_peft_output")
     tokenizer.save_pretrained("./t5_lora_peft_output")
