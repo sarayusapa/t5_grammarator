@@ -66,7 +66,7 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(1000000))  # first 100000 samples
+    #train_dataset = train_dataset.select(range(1000000))  # first 100000 samples
     eval_dataset = eval_dataset.select(range(10000))    # first 10000 samples
 
 
@@ -208,6 +208,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
