@@ -1,7 +1,7 @@
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 # Path to your saved model folder
-model_path = "./T5_large_QLoRA"
+model_path = "qlora-flan-t5-base-large"
 
 # Load model & tokenizer
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
