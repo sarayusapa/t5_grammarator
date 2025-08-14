@@ -1,7 +1,7 @@
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 # Path to your saved model folder
-model_path = "./T5-grammarator"
+model_path = "./T5_large_QLoRA"
 
 # Load model & tokenizer
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
