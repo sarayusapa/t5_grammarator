@@ -1,12 +1,11 @@
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from peft import PeftModel, Peftconfig, get_peft_model
 
-# Path to your saved model folder
-model_path = "qlora-flan-t5-base-large"
+base_model = AutoModelForSeq2SeqLM.from_pretrained("t5-large", torch_dtype=torch.float16)
+model = PeftModel.from_pretrained(base_model, "./qlora-flan-t5-base-lang8")
+model = model.merge_aND_unload()
 
-# Load model & tokenizer
-model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
-tokenizer = AutoTokenizer.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained("t5-large")
 
-# Push to Hugging Face Hub
 model.push_to_hub("sarayusapa/T5_large_QLoRA")
 tokenizer.push_to_hub("sarayusapa/T5_large_QLoRA")
