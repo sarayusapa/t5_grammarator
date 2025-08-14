@@ -4,7 +4,7 @@ import torch
 
 base_model = AutoModelForSeq2SeqLM.from_pretrained("t5-large", torch_dtype=torch.float16)
 model = PeftModel.from_pretrained(base_model, "./qlora-flan-t5-base-lang8")
-model = model.merge_aND_unload()
+model = model.merge_and_unload()
 
 tokenizer = AutoTokenizer.from_pretrained("t5-large")
 
