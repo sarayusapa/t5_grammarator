@@ -9,4 +9,4 @@ tokenizer = AutoTokenizer.from_pretrained(model_path)
 
 # Push to Hugging Face Hub
 model.push_to_hub("sarayusapa/t5_lora_peft_output")
-tokenizer.push_to_hub("sarayusapa/your-model-name")
+tokenizer.push_to_hub("sarayusapa/t5_lora_peft_output")
