@@ -67,7 +67,7 @@ def main() -> None:
 
     # Choose a train split; create a small eval from it if no dedicated split
     train_dataset = ds["train"]
-    eval_dataset = ds["test"]
+    eval_dataset = ds["validation"]
 
     #small batch for testing, comment out later
     #train_dataset = train_dataset.select(range(500000))  # first 100000 samples
@@ -172,6 +172,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
