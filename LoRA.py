@@ -17,18 +17,14 @@ wandb.init(
 
 def main() -> None:
     model_name = "t5-large"
-
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
-
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name, device_map="auto")
     model.gradient_checkpointing_enable()
     if hasattr(model.config, "use_cache"):
         model.config.use_cache = False
-
     model = prepare_model_for_kbit_training(model)
-
     lora_config = LoraConfig(
         r=8,
         lora_alpha=32,
@@ -38,16 +34,13 @@ def main() -> None:
         task_type=TaskType.SEQ_2_SEQ_LM,
     )
     model = get_peft_model(model, lora_config)
-
     ds = load_dataset("Hritshhh/T5-Dataset")
     split_name = "train" if "train" in ds else list(ds.keys())[0]
     base_train = ds[split_name]
     split = base_train.train_test_split(test_size=0.01, seed=42)
     train_dataset, eval_dataset = split["train"], split["test"]
-
     train_dataset = train_dataset.select(range(100000))
     eval_dataset = eval_dataset.select(range(10000))
-
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = None, None, False
     candidates = [
@@ -79,21 +72,17 @@ def main() -> None:
                 if tgt_is_list
                 else (tgt_val or "")
             )
-
             prompt = (
                 "Correct the grammar of the following sentence.\n"
                 f"Input: {src_text}\n"
                 "Output: "
             )
-
             prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"]
             target_ids = tokenizer(tgt_text, add_special_tokens=False)["input_ids"] + [
                 tokenizer.eos_token_id
             ]
-
             input_ids = prompt_ids + target_ids
             label_ids = ([-100] * len(prompt_ids)) + target_ids
-
             input_ids_list.append(input_ids)
             label_ids_list.append(label_ids)
 
@@ -105,13 +94,11 @@ def main() -> None:
             padded_inputs.append(inp_ids + [tokenizer.pad_token_id] * pad_len)
             padded_labels.append(lab_ids + [-100] * pad_len)
             attention_masks.append([1] * len(inp_ids) + [0] * pad_len)
-
         return {
             "input_ids": padded_inputs,
             "labels": padded_labels,
             "attention_mask": attention_masks,
         }
-
     tokenized_train = train_dataset.map(preprocess_function, batched=True, remove_columns=train_dataset.column_names)
     tokenized_eval = eval_dataset.map(preprocess_function, batched=True, remove_columns=eval_dataset.column_names)
 
@@ -122,7 +109,6 @@ def main() -> None:
                 "labels": torch.empty((0, 0), dtype=torch.long),
                 "attention_mask": torch.empty((0, 0), dtype=torch.long),
             }
-
         max_len = max(len(f["input_ids"]) for f in features)
         pad_id = tokenizer.pad_token_id
 
@@ -171,7 +157,6 @@ def main() -> None:
         result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
         return {"bleu": result["bleu"]}
 
-
     training_args = Seq2SeqTrainingArguments(
         output_dir="./t5_lora_peft_output",
         per_device_train_batch_size=8,
@@ -195,7 +180,7 @@ def main() -> None:
         dataloader_pin_memory=True,
         gradient_checkpointing=True,
         lr_scheduler_type="linear",
-        predict_with_generate=True,  # Needed for Seq2Seq generation
+        predict_with_generate=True,  
     )
 
     trainer = Seq2SeqTrainer(
