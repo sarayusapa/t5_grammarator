@@ -21,8 +21,8 @@ import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="t5-large-QL", 
-    name="kaggle-run-final",
+    project="t5-large-QL-final", 
+    name="200k-final",
 )
 
 def main() -> None:
@@ -73,7 +73,7 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(50000))  # first 100000 samples
+    # train_dataset = train_dataset.select(range(50000))  # first 100000 samples
     eval_dataset = eval_dataset.select(range(1000))    # first 10000 samples
 
     feature_names = set(train_dataset.features.keys())
@@ -143,7 +143,7 @@ def main() -> None:
 
     # Training
     training_args = Seq2SeqTrainingArguments(
-        output_dir="./ModelCheckpoints",
+        output_dir="./ModelCheckpoints-FINAL",
         per_device_train_batch_size=32,
         per_device_eval_batch_size=1,
         gradient_accumulation_steps=2,
@@ -152,9 +152,9 @@ def main() -> None:
         learning_rate=1e-4, 
         warmup_ratio = 0.05,
         save_strategy="steps",
-        save_steps=2000,
+        save_steps=5000,
         eval_strategy="steps",
-        eval_steps = 1000,
+        eval_steps = 2000,
         logging_strategy = "steps",
         logging_steps = 50,
         optim="paged_adamw_8bit",
@@ -179,18 +179,18 @@ def main() -> None:
 
     trainer.train()
 
-    # Save QLoRA adapters and tokenizer
-    save_dir = "./qlora-t5-large"
+    save_dir = "./qlora-t5-large-FINAL"
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 
-    trainer.model.push_to_hub("sarayusapa/T5_Large_QLoRA")
-    tokenizer.push_to_hub("sarayusapa/T5_Large_QLoRA")
+    trainer.model.push_to_hub("sarayusapa/T5_Large_GEC_QLoRA")
+    tokenizer.push_to_hub("sarayusapa/T5_Large_GEC_QLoRA")
 
 
 if __name__ == "__main__":
 
     main()
+
 
 
 
