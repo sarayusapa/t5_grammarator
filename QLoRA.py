@@ -151,7 +151,6 @@ def main() -> None:
         logging_strategy = "steps",
         logging_steps = 50,
         optim="paged_adamw_8bit",
-        predict_with_generate=False,
         dataloader_pin_memory=True,
         tf32=False,
         fp16=False,
@@ -184,6 +183,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
