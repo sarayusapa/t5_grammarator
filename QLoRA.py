@@ -103,12 +103,13 @@ def main() -> None:
         model_inputs["labels"] = labels
         return model_inputs
 
-    print("Example labels:", labels[0])
-    print("Number of valid tokens:", sum(t != -100 for t in labels[0]))
-
 
     tokenized_train = train_dataset.map(preprocess_function, batched=True, remove_columns=train_dataset.column_names, load_from_cache_file=False, desc="Tokenized Train")
     tokenized_eval = eval_dataset.map(preprocess_function, batched=True, remove_columns=eval_dataset.column_names, load_from_cache_file=False, desc="Tokenized Eval")
+    example_labels = tokenized_train["labels"][0]
+    print("Example labels:", example_labels)
+    print("Number of valid tokens:", sum(t != -100 for t in example_labels))
+    
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, label_pad_token_id=-100)
     print(tokenized_train["labels"][0][:20])
 
@@ -183,6 +184,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
