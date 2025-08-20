@@ -73,7 +73,7 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(25000))  # first 100000 samples
+    train_dataset = train_dataset.select(range(50000))  # first 100000 samples
     eval_dataset = eval_dataset.select(range(1000))    # first 10000 samples
 
     feature_names = set(train_dataset.features.keys())
@@ -138,7 +138,7 @@ def main() -> None:
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints",
         per_device_train_batch_size=32,
-        per_device_eval_batch_size=4,
+        per_device_eval_batch_size=2,
         gradient_accumulation_steps=2,
         gradient_checkpointing=True,
         num_train_epochs=2,
@@ -183,6 +183,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
