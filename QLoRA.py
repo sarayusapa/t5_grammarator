@@ -171,10 +171,11 @@ def main() -> None:
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 
-    trainer.model.push_to_hub(sarayusapa/T5_Large_QLoRA)
-    tokenizer.push_to_hub(sarayusapa/T5_Large_QLoRA)
+    trainer.model.push_to_hub("sarayusapa/T5_Large_QLoRA")
+    tokenizer.push_to_hub("sarayusapa/T5_Large_QLoRA")
 
 
 if __name__ == "__main__":
 
     main()
+
