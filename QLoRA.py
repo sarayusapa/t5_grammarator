@@ -103,6 +103,10 @@ def main() -> None:
         model_inputs["labels"] = labels
         return model_inputs
 
+    print("Example labels:", labels[0])
+    print("Number of valid tokens:", sum(t != -100 for t in labels[0]))
+
+
     tokenized_train = train_dataset.map(preprocess_function, batched=True, remove_columns=train_dataset.column_names, load_from_cache_file=False, desc="Tokenized Train")
     tokenized_eval = eval_dataset.map(preprocess_function, batched=True, remove_columns=eval_dataset.column_names, load_from_cache_file=False, desc="Tokenized Eval")
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, label_pad_token_id=-100)
@@ -149,8 +153,8 @@ def main() -> None:
         predict_with_generate=False,
         dataloader_pin_memory=True,
         tf32=False,
-        fp16=True,
-        bf16=False,
+        fp16=False,
+        bf16=True,
         lr_scheduler_type="cosine", 
         report_to=["wandb"],
     )
@@ -179,6 +183,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
