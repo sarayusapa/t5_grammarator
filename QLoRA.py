@@ -74,7 +74,7 @@ def main() -> None:
 
     #small batch for testing, comment out later
     train_dataset = train_dataset.select(range(50000))  # first 100000 samples
-    eval_dataset = eval_dataset.select(range(1000))    # first 10000 samples
+    eval_dataset = eval_dataset.select(range(500))    # first 10000 samples
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = "wrong", "correct", False
@@ -183,6 +183,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
