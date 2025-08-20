@@ -120,7 +120,7 @@ def main() -> None:
         
         # Compute BLEU
         bleu = bleu_metric.compute(predictions=decoded_preds, references=[[l] for l in decoded_labels])
-
+        print(f"BLEU score: {bleu['bleu']}") 
         exact_matches = sum(p.strip() == l.strip() for p, l in zip(decoded_preds, decoded_labels))
         accuracy = exact_matches / len(decoded_preds)
         return {
@@ -178,4 +178,5 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
