@@ -74,8 +74,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(50000))  # first 100000 samples
-    eval_dataset = eval_dataset.select(range(500))    # first 10000 samples
+    train_dataset = train_dataset.select(range(10000))  # first 100000 samples
+    eval_dataset = eval_dataset.select(range(100))    # first 10000 samples
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = "wrong", "correct", False
@@ -152,7 +152,7 @@ def main() -> None:
         save_strategy="steps",
         save_steps=2000,
         eval_strategy="steps",
-        eval_steps = 1000,
+        eval_steps = 200,
         logging_strategy = "steps",
         logging_steps = 50,
         optim="paged_adamw_8bit",
@@ -188,6 +188,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
