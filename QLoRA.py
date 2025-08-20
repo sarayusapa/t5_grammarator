@@ -148,13 +148,13 @@ def main() -> None:
         per_device_eval_batch_size=1,
         gradient_accumulation_steps=2,
         gradient_checkpointing=True,
-        num_train_epochs=2,
+        num_train_epochs=3,
         learning_rate=1e-4, 
         warmup_ratio = 0.05,
         save_strategy="steps",
         save_steps=5000,
         eval_strategy="steps",
-        eval_steps = 2000,
+        eval_steps = 3000,
         logging_strategy = "steps",
         logging_steps = 50,
         optim="paged_adamw_8bit",
@@ -190,6 +190,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
