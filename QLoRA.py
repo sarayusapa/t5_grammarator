@@ -9,6 +9,7 @@ from transformers import (
     BitsAndBytesConfig,
     Trainer,
     TrainingArguments,
+    predict_with_generate=True,
     default_data_collator,
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
@@ -119,6 +120,10 @@ def main() -> None:
     def compute_metrics(eval_pred):
         predictions, labels = eval_pred
         # Decode generated tokens
+        if isinstance(predictions, tuple):
+            predictions = predictions[0]
+        
+        print("Predictions shape/type:", type(predictions), getattr(predictions, 'shape', 'no shape'))
         decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
         # Replace -100 in labels and decode
         labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
@@ -145,7 +150,7 @@ def main() -> None:
         learning_rate=1.2e-4, 
         warmup_ratio = 0.05,
         save_strategy="steps",
-        save_steps=1000,
+        save_steps=2000,
         eval_strategy="steps",
         eval_steps = 1000,
         logging_strategy = "steps",
@@ -183,6 +188,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
