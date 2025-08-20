@@ -5,10 +5,14 @@ from transformers import (
     AutoModelForSeq2SeqLM,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
+    DataCollatorForSeq2Seq
 )
 import evaluate
+import numpy as np
 import wandb
 from peft import LoraConfig, get_peft_model, TaskType, prepare_model_for_kbit_training
+
+torch.cuda.empty_cache()
 
 wandb.init(
     project="t5-large-lora-peft",
@@ -17,14 +21,18 @@ wandb.init(
 
 def main() -> None:
     model_name = "t5-large"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True) #dropout rate, attention dropout_rate
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
+
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name, device_map="auto")
     model.gradient_checkpointing_enable()
     if hasattr(model.config, "use_cache"):
         model.config.use_cache = False
+
     model = prepare_model_for_kbit_training(model)
+
     lora_config = LoraConfig(
         r=8,
         lora_alpha=32,
@@ -34,128 +42,68 @@ def main() -> None:
         task_type=TaskType.SEQ_2_SEQ_LM,
     )
     model = get_peft_model(model, lora_config)
-    ds = load_dataset("Hritshhh/T5-Dataset")
-    split_name = "train" if "train" in ds else list(ds.keys())[0]
-    base_train = ds[split_name]
-    split = base_train.train_test_split(test_size=0.01, seed=42)
-    train_dataset, eval_dataset = split["train"], split["test"]
-    train_dataset = train_dataset.select(range(100000))
-    eval_dataset = eval_dataset.select(range(10000))
-    feature_names = set(train_dataset.features.keys())
-    src_field, tgt_field, tgt_is_list = None, None, False
-    candidates = [
-        ("source", "target", False),
-        ("incorrect", "corrected", False),
-        ("original", "correction", False),
-        ("sentence", "corrections", True),
-        ("input", "output", False),
-        ("processed_input", "processed_output", False),
-        ("input_text", "target_text", False),
-    ]
-    for s, t, is_list in candidates:
-        if s in feature_names and t in feature_names:
-            src_field, tgt_field, tgt_is_list = s, t, is_list
-            break
-    if src_field is None:
-        raise ValueError(f"Unsupported dataset schema: found features {feature_names}")
+
+    ds = load_dataset("sarayusapa/Grammar_Error_Correction")
+
+    train_dataset = ds["train"]
+    eval_dataset = ds["validation"]
+
+    src_field, tgt_field, tgt_is_list = "wrong", "correct", False
 
     def preprocess_function(examples):
-        sources = examples[src_field]
-        targets = examples[tgt_field]
+        sources = [f"Grammar Correction: {s}" for s in examples["wrong"]]
+        targets = examples["correct"]
 
-        input_ids_list = []
-        label_ids_list = []
+        model_inputs = tokenizer(
+            sources,
+            max_length=128,
+            truncation=True,
+            padding="max_length",
+            add_special_tokens=True
+        )
+        with tokenizer.as_target_tokenizer():
+            labels = tokenizer(
+                targets,
+                max_length=128,
+                truncation=True,
+                padding="max_length",
+                add_special_tokens=True
+            )["input_ids"]
 
-        for src_text, tgt_val in zip(sources, targets):
-            tgt_text = (
-                (tgt_val[0] if isinstance(tgt_val, list) and len(tgt_val) > 0 else "")
-                if tgt_is_list
-                else (tgt_val or "")
-            )
-            prompt = (
-                "Correct the grammar of the following sentence.\n"
-                f"Input: {src_text}\n"
-                "Output: "
-            )
-            prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"]
-            target_ids = tokenizer(tgt_text, add_special_tokens=False)["input_ids"] + [
-                tokenizer.eos_token_id
-            ]
-            input_ids = prompt_ids + target_ids
-            label_ids = ([-100] * len(prompt_ids)) + target_ids
-            input_ids_list.append(input_ids)
-            label_ids_list.append(label_ids)
+        labels = [[(t if t != tokenizer.pad_token_id else -100) for t in lab] for lab in labels]
+        model_inputs["labels"] = labels
+        return model_inputs
 
-        max_len = max(len(ids) for ids in input_ids_list)
-        padded_inputs, padded_labels, attention_masks = [], [], []
+    tokenized_train = train_dataset.map(preprocess_function, batched=True, remove_columns=train_dataset.column_names, load_from_cache_file=False, desc="Tokenized Train")
+    tokenized_eval = eval_dataset.map(preprocess_function, batched=True, remove_columns=eval_dataset.column_names, load_from_cache_file=False, desc="Tokenized Eval")
+    data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, label_pad_token_id=-100)
 
-        for inp_ids, lab_ids in zip(input_ids_list, label_ids_list):
-            pad_len = max_len - len(inp_ids)
-            padded_inputs.append(inp_ids + [tokenizer.pad_token_id] * pad_len)
-            padded_labels.append(lab_ids + [-100] * pad_len)
-            attention_masks.append([1] * len(inp_ids) + [0] * pad_len)
-        return {
-            "input_ids": padded_inputs,
-            "labels": padded_labels,
-            "attention_mask": attention_masks,
-        }
-    tokenized_train = train_dataset.map(preprocess_function, batched=True, remove_columns=train_dataset.column_names)
-    tokenized_eval = eval_dataset.map(preprocess_function, batched=True, remove_columns=eval_dataset.column_names)
+    print(tokenized_train["labels"][0][:20])
 
-    def batch_pad_collator(features):
-        if len(features) == 0:
-            return {
-                "input_ids": torch.empty((0, 0), dtype=torch.long),
-                "labels": torch.empty((0, 0), dtype=torch.long),
-                "attention_mask": torch.empty((0, 0), dtype=torch.long),
-            }
-        max_len = max(len(f["input_ids"]) for f in features)
-        pad_id = tokenizer.pad_token_id
 
-        input_ids = [f["input_ids"] + [pad_id] * (max_len - len(f["input_ids"])) for f in features]
-        labels = [f["labels"] + [-100] * (max_len - len(f["labels"])) for f in features]
-        attention_mask = [f["attention_mask"] + [0] * (max_len - len(f["attention_mask"])) for f in features]
+    bleu_metric = evaluate.load("bleu")
+
+    def compute_metrics(eval_pred):
+        predictions, labels = eval_pred
+
+        decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
+
+        labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
+        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
+
+
+        bleu = bleu_metric.compute(
+            predictions=decoded_preds, references=[[l] for l in decoded_labels]
+        )
+
+        exact_matches = sum(p.strip() == l.strip() for p, l in zip(decoded_preds, decoded_labels))
+        accuracy = exact_matches / len(decoded_preds)
 
         return {
-            "input_ids": torch.tensor(input_ids, dtype=torch.long),
-            "labels": torch.tensor(labels, dtype=torch.long),
-            "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
+            "bleu": bleu["bleu"],
+            "accuracy": accuracy,
         }
-        
-    bleu = evaluate.load("bleu")
 
-    def postprocess_text(preds, labels):
-        preds = [pred.strip() for pred in preds]
-        labels = [[label.strip()] for label in labels]  # BLEU expects list of references per prediction
-        return preds, labels
-
-    def compute_metrics(eval_preds):
-        preds, labels = eval_preds
-        if isinstance(preds, tuple):
-            preds = preds[0]
-
-    # Ensure preds is int32 and in vocab range
-        preds = torch.tensor(preds, dtype=torch.int32)
-        preds = torch.clamp(preds, 0, tokenizer.vocab_size - 1).tolist()
-
-    # Decode preds safely
-        decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-
-    # Process labels: replace -100 with pad_token_id, ensure int32, clamp
-        safe_labels = []
-        for label in labels:
-            safe_label = [(l if l != -100 else tokenizer.pad_token_id) for l in label]
-            safe_label = torch.tensor(safe_label, dtype=torch.int32)
-            safe_label = torch.clamp(safe_label, 0, tokenizer.vocab_size - 1)
-            safe_labels.append(safe_label.tolist())
-        decoded_labels = tokenizer.batch_decode(safe_labels, skip_special_tokens=True)
-
-    # Strip and postprocess for BLEU
-        decoded_preds = [p.strip() for p in decoded_preds]
-        decoded_labels = [[l.strip()] for l in decoded_labels]  # BLEU expects list of references per prediction
-
-        result = bleu.compute(predictions=decoded_preds, references=decoded_labels)
-        return {"bleu": result["bleu"]}
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./t5_lora_peft_output",
@@ -180,7 +128,7 @@ def main() -> None:
         dataloader_pin_memory=True,
         gradient_checkpointing=True,
         lr_scheduler_type="linear",
-        predict_with_generate=True,  
+        predict_with_generate=True,  # Needed for Seq2Seq generation
     )
 
     trainer = Seq2SeqTrainer(
@@ -189,15 +137,22 @@ def main() -> None:
         train_dataset=tokenized_train,
         eval_dataset=tokenized_eval,
         tokenizer=tokenizer,
-        data_collator=batch_pad_collator,
+        data_collator=data_collator,
         compute_metrics=compute_metrics,
     )
 
     trainer.train()
     metrics = trainer.evaluate()
 
+    print(f"BLEU score: {metrics['eval_bleu']}")
+    print(f"Accuracy: {metrics['eval_accuracy']}")
+
     model.save_pretrained("./t5_lora_peft_output")
     tokenizer.save_pretrained("./t5_lora_peft_output")
+
+    trainer.model.push_to_hub("sarayusapa/T5_Large_QLoRA")
+    tokenizer.push_to_hub("sarayusapa/T5_Large_QLoRA")
+
 
 if __name__ == "__main__":
     main()
