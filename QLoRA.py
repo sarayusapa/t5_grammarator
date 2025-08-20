@@ -73,8 +73,8 @@ def main() -> None:
 
 
     #small batch for testing, comment out later
-    train_dataset = train_dataset.select(range(10000))  # first 100000 samples
-    eval_dataset = eval_dataset.select(range(100))    # first 10000 samples
+    train_dataset = train_dataset.select(range(50000))  # first 100000 samples
+    eval_dataset = eval_dataset.select(range(1000))    # first 10000 samples
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = "wrong", "correct", False
@@ -149,12 +149,12 @@ def main() -> None:
         gradient_accumulation_steps=2,
         gradient_checkpointing=True,
         num_train_epochs=2,
-        learning_rate=1.2e-4, 
+        learning_rate=1e-4, 
         warmup_ratio = 0.05,
         save_strategy="steps",
         save_steps=2000,
         eval_strategy="steps",
-        eval_steps = 200,
+        eval_steps = 1000,
         logging_strategy = "steps",
         logging_steps = 50,
         optim="paged_adamw_8bit",
@@ -191,6 +191,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
