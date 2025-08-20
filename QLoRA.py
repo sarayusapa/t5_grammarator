@@ -9,7 +9,6 @@ from transformers import (
     BitsAndBytesConfig,
     Trainer,
     TrainingArguments,
-    predict_with_generate=True,
     default_data_collator,
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
@@ -157,6 +156,7 @@ def main() -> None:
         logging_steps = 50,
         optim="paged_adamw_8bit",
         dataloader_pin_memory=True,
+        predict_with_generate=True,
         tf32=False,
         fp16=False,
         bf16=True,
@@ -188,6 +188,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
