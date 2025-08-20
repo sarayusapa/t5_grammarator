@@ -118,12 +118,15 @@ def main() -> None:
     
     def compute_metrics(eval_pred):
         predictions, labels = eval_pred
-        # Decode generated tokens
         if isinstance(predictions, tuple):
-            predictions = predictions[0]
-        
-        print("Predictions shape/type:", type(predictions), getattr(predictions, 'shape', 'no shape'))
+        predictions = predictions[0]
+
+        if torch.is_tensor(predictions):
+        predictions = predictions.cpu().numpy()
+
+        predictions = np.clip(predictions, 0, tokenizer.vocab_size - 1)
         decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
+        # Decode generated tokens
         # Replace -100 in labels and decode
         labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
         decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
@@ -188,6 +191,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
