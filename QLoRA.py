@@ -85,7 +85,7 @@ def main() -> None:
 
         model_inputs = tokenizer(
             sources,
-            max_length=128,
+            max_length=64,
             truncation=True,
             padding="max_length", 
             add_special_tokens=True
@@ -93,7 +93,7 @@ def main() -> None:
         with tokenizer.as_target_tokenizer():
             labels = tokenizer(
                 targets,
-                max_length=128,
+                max_length=64,
                 truncation=True,
                 padding="max_length",
                 add_special_tokens=True
@@ -138,7 +138,7 @@ def main() -> None:
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints",
         per_device_train_batch_size=32,
-        per_device_eval_batch_size=2,
+        per_device_eval_batch_size=1,
         gradient_accumulation_steps=2,
         gradient_checkpointing=True,
         num_train_epochs=2,
@@ -147,7 +147,7 @@ def main() -> None:
         save_strategy="steps",
         save_steps=1000,
         eval_strategy="steps",
-        eval_steps = 200,
+        eval_steps = 1000,
         logging_strategy = "steps",
         logging_steps = 50,
         optim="paged_adamw_8bit",
@@ -183,6 +183,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
