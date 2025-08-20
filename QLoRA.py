@@ -71,9 +71,10 @@ def main() -> None:
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
 
+
     #small batch for testing, comment out later
-    #train_dataset = train_dataset.select(range(500000))  # first 100000 samples
-    #eval_dataset = eval_dataset.select(range(5000))    # first 10000 samples
+    train_dataset = train_dataset.select(range(25000))  # first 100000 samples
+    eval_dataset = eval_dataset.select(range(1000))    # first 10000 samples
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = "wrong", "correct", False
@@ -132,18 +133,18 @@ def main() -> None:
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints",
         per_device_train_batch_size=32,
-        per_device_eval_batch_size=16,
-        gradient_accumulation_steps=4,
-        gradient_checkpointing=False,
+        per_device_eval_batch_size=4,
+        gradient_accumulation_steps=2,
+        gradient_checkpointing=True,
         num_train_epochs=2,
         learning_rate=1.2e-4, 
         warmup_ratio = 0.05,
         save_strategy="steps",
-        save_steps=10000,
+        save_steps=1000,
         eval_strategy="steps",
-        eval_steps = 10000,
+        eval_steps = 200,
         logging_strategy = "steps",
-        logging_steps = 1000,
+        logging_steps = 50,
         optim="paged_adamw_8bit",
         predict_with_generate=False,
         dataloader_pin_memory=True,
@@ -178,5 +179,6 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
