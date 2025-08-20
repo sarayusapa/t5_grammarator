@@ -119,10 +119,10 @@ def main() -> None:
     def compute_metrics(eval_pred):
         predictions, labels = eval_pred
         if isinstance(predictions, tuple):
-        predictions = predictions[0]
+            predictions = predictions[0]
 
         if torch.is_tensor(predictions):
-        predictions = predictions.cpu().numpy()
+            predictions = predictions.cpu().numpy()
 
         predictions = np.clip(predictions, 0, tokenizer.vocab_size - 1)
         decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
@@ -191,6 +191,7 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
+
 
 
 
