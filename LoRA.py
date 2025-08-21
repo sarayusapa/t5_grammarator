@@ -159,7 +159,6 @@ def main() -> None:
         bf16=torch.cuda.is_available(),
         lr_scheduler_type="linear",
         report_to=["wandb"],
-        load_best_model_at_end=True,
         metric_for_best_model="bleu",
         greater_is_better=True,
     )
