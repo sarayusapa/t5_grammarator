@@ -17,8 +17,8 @@ torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
 
 wandb.init(
-    project="t5-large-full-ft",
-    name="t5-large-full_FT",
+    project="t5-large_full-ft_test",
+    name="t5-large_full-ft_50k_run",
 )
 
 def main() -> None:
@@ -41,6 +41,9 @@ def main() -> None:
     ds = load_dataset("sarayusapa/Grammar_Error_Correction")
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
+
+    train_dataset = train_dataset.select(range(50000))
+    eval_dataset = eval_dataset.select(range(1000))
 
     max_source_len = 128
     max_target_len = 128
@@ -175,7 +178,7 @@ def main() -> None:
 
     trainer.train()
 
-    save_dir = "./t5-large-fullft"
+    save_dir = "./t5-large_fullft"
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 

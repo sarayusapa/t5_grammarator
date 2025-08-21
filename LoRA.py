@@ -1,71 +1,55 @@
 import torch
-from torch.utils.data import DataLoader
-import evaluate
-import numpy as np
 from datasets import load_dataset
 from transformers import (
     AutoTokenizer,
     AutoModelForSeq2SeqLM,
-    Trainer,
-    TrainingArguments,
-    default_data_collator,
-    DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
-    Seq2SeqTrainingArguments
+    Seq2SeqTrainingArguments,
+    DataCollatorForSeq2Seq
 )
+import evaluate
+import numpy as np
+import wandb
+from peft import LoraConfig, get_peft_model, TaskType, prepare_model_for_kbit_training
 
 torch.cuda.empty_cache()
 
-import wandb
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
-
 wandb.init(
-    project="t5-large-lora-tests",
-    name="50k-lora-run",
+    project="t5-large-lora-peft",
+    name="lora-peft-run",
 )
 
 def main() -> None:
-    # Model: T5-large
     model_name = "t5-large"
 
-    # Tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True) #dropout rate, attention dropout_rate
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    # Base model (full precision, no quantization for plain LoRA)
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        model_name,
-        device_map="auto",
-    )
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name, device_map="auto")
     model.gradient_checkpointing_enable()
-
-    # Disable cache for training to reduce memory and enable checkpointing compatibility
     if hasattr(model.config, "use_cache"):
         model.config.use_cache = False
 
-    # Prepare for LoRA training
-    model = prepare_model_for_kbit_training(model)  # still useful for uniformity
+    model = prepare_model_for_kbit_training(model)
+
     lora_config = LoraConfig(
         r=8,
         lora_alpha=32,
-        target_modules=["q", "k", "v", "o"],  # more modules than QLoRA case
+        target_modules=["q","k","v", "o"],
         lora_dropout=0.1,
         bias="none",
         task_type=TaskType.SEQ_2_SEQ_LM,
     )
     model = get_peft_model(model, lora_config)
 
-    # Dataset: Lang-8 on HF Hub
     ds = load_dataset("sarayusapa/Grammar_Error_Correction")
 
-    # Choose splits
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
 
-    # (optional small eval)
     train_dataset = train_dataset.select(range(50000))
-    eval_dataset = eval_dataset.select(range(100))
+    eval_dataset = eval_dataset.select(range(1000))
 
     src_field, tgt_field, tgt_is_list = "wrong", "correct", False
 
@@ -75,7 +59,7 @@ def main() -> None:
 
         model_inputs = tokenizer(
             sources,
-            max_length=64,
+            max_length=128,
             truncation=True,
             padding="max_length",
             add_special_tokens=True
@@ -83,7 +67,7 @@ def main() -> None:
         with tokenizer.as_target_tokenizer():
             labels = tokenizer(
                 targets,
-                max_length=64,
+                max_length=128,
                 truncation=True,
                 padding="max_length",
                 add_special_tokens=True
@@ -93,41 +77,27 @@ def main() -> None:
         model_inputs["labels"] = labels
         return model_inputs
 
-
     tokenized_train = train_dataset.map(preprocess_function, batched=True, remove_columns=train_dataset.column_names, load_from_cache_file=False, desc="Tokenized Train")
     tokenized_eval = eval_dataset.map(preprocess_function, batched=True, remove_columns=eval_dataset.column_names, load_from_cache_file=False, desc="Tokenized Eval")
-
-    example_labels = tokenized_train["labels"][0]
-    print("Example labels:", example_labels)
-    print("Number of valid tokens:", sum(t != -100 for t in example_labels))
-
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, label_pad_token_id=-100)
+
     print(tokenized_train["labels"][0][:20])
 
-    # Metrics
+
     bleu_metric = evaluate.load("bleu")
 
     def compute_metrics(eval_pred):
         predictions, labels = eval_pred
-        if isinstance(predictions, tuple):
-            predictions = predictions[0]
 
-        if torch.is_tensor(predictions):
-            predictions = predictions.cpu().numpy()
-
-        predictions = np.clip(predictions, 0, tokenizer.vocab_size - 1)
         decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
-
 
         labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
         decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
 
 
         bleu = bleu_metric.compute(
-            predictions=decoded_preds,
-            references=[[l] for l in decoded_labels]
+            predictions=decoded_preds, references=[[l] for l in decoded_labels]
         )
-        print(f"BLEU score: {bleu['bleu']}")
 
         exact_matches = sum(p.strip() == l.strip() for p, l in zip(decoded_preds, decoded_labels))
         accuracy = exact_matches / len(decoded_preds)
@@ -139,28 +109,29 @@ def main() -> None:
 
 
     training_args = Seq2SeqTrainingArguments(
-        output_dir="./ModelCheckpoints-LoRA",
-        per_device_train_batch_size=32,
-        per_device_eval_batch_size=1,
-        gradient_accumulation_steps=1,
-        gradient_checkpointing=True,
-        num_train_epochs=2,
-        learning_rate=2e-4,
-        warmup_ratio=0.025,
-        save_strategy="steps",
-        save_steps=5000,
+        output_dir="./t5_lora_peft_output",
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=2,
+        gradient_accumulation_steps=4,
         eval_strategy="steps",
-        eval_steps=3000,
-        logging_strategy="steps",
-        logging_steps=50,
-        optim="adamw_torch",
-        dataloader_pin_memory=True,
-        predict_with_generate=True,
+        eval_steps=8,
+        save_steps=8,
+        max_steps=48,
+        learning_rate=2.4e-4,
+        warmup_ratio=0.025,
+        logging_steps=2,
+        save_total_limit=2,
         bf16=torch.cuda.is_available(),
-        lr_scheduler_type="linear",
+        optim="adamw_torch",
         report_to=["wandb"],
+        logging_dir="./logs",
+        load_best_model_at_end=True,
         metric_for_best_model="bleu",
         greater_is_better=True,
+        dataloader_pin_memory=True,
+        gradient_checkpointing=True,
+        lr_scheduler_type="linear",
+        predict_with_generate=True,  
     )
 
     trainer = Seq2SeqTrainer(
@@ -174,14 +145,16 @@ def main() -> None:
     )
 
     trainer.train()
+    metrics = trainer.evaluate()
 
-    save_dir = "./lora-t5-large"
-    trainer.model.save_pretrained(save_dir)
-    tokenizer.save_pretrained(save_dir)
+    print(f"BLEU score: {metrics['eval_bleu']}")
+    print(f"Accuracy: {metrics['eval_accuracy']}")
 
-    trainer.model.push_to_hub("sarayusapa/lora-test-models")
-    tokenizer.push_to_hub("sarayusapa/lora-test-models")
+    model.save_pretrained("./t5_lora_peft_output")
+    tokenizer.save_pretrained("./t5_lora_peft_output")
 
+    trainer.model.push_to_hub("Hritshhh/T5_Large_LoRA")
+    tokenizer.push_to_hub("Hritshhh/T5_Large_LoRA")
 
 if __name__ == "__main__":
     main()

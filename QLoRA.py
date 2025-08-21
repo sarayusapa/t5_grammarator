@@ -26,15 +26,13 @@ wandb.init(
 )
 
 def main() -> None:
-    # Model: T5-large
+
     model_name = "t5-large"
 
-    # Tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True, dropout_rate=0.1, attention_dropout_rate=0.1)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    # 4-bit quantization config (QLoRA)
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
@@ -42,14 +40,12 @@ def main() -> None:
         bnb_4bit_compute_dtype=torch.bfloat16,
     )
 
-    # Base model in 4-bit
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_name,
         quantization_config=bnb_config,
         device_map="auto",
     )
 
-    # Prepare for k-bit training and apply LoRA
     model = prepare_model_for_kbit_training(model)
     lora_config = LoraConfig(
         r=8,
@@ -64,17 +60,13 @@ def main() -> None:
     if hasattr(model, "config"):
         model.config.use_cache = False
 
-    # Dataset: Lang-8 on HF Hub
     ds = load_dataset("sarayusapa/Grammar_Error_Correction")
 
-    # Choose a train split; create a small eval from it if no dedicated split
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
 
-
-    #small batch for testing, comment out later
-    # train_dataset = train_dataset.select(range(50000))  # first 100000 samples
-    eval_dataset = eval_dataset.select(range(1000))    # first 10000 samples
+    # train_dataset = train_dataset.select(range(50000))  
+    eval_dataset = eval_dataset.select(range(1000))    
 
     feature_names = set(train_dataset.features.keys())
     src_field, tgt_field, tgt_is_list = "wrong", "correct", False
@@ -103,7 +95,6 @@ def main() -> None:
         model_inputs["labels"] = labels
         return model_inputs
 
-
     tokenized_train = train_dataset.map(preprocess_function, batched=True, remove_columns=train_dataset.column_names, load_from_cache_file=False, desc="Tokenized Train")
     tokenized_eval = eval_dataset.map(preprocess_function, batched=True, remove_columns=eval_dataset.column_names, load_from_cache_file=False, desc="Tokenized Eval")
     example_labels = tokenized_train["labels"][0]
@@ -126,12 +117,9 @@ def main() -> None:
 
         predictions = np.clip(predictions, 0, tokenizer.vocab_size - 1)
         decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
-        # Decode generated tokens
-        # Replace -100 in labels and decode
         labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
         decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
         
-        # Compute BLEU
         bleu = bleu_metric.compute(predictions=decoded_preds, references=[[l] for l in decoded_labels])
         print(f"BLEU score: {bleu['bleu']}") 
         exact_matches = sum(p.strip() == l.strip() for p, l in zip(decoded_preds, decoded_labels))
@@ -141,7 +129,6 @@ def main() -> None:
             "accuracy": accuracy
         }
 
-    # Training
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints-FINAL",
         per_device_train_batch_size=32,
@@ -185,7 +172,6 @@ def main() -> None:
 
     trainer.model.push_to_hub("sarayusapa/T5_Large_GEC_QLoRA")
     tokenizer.push_to_hub("sarayusapa/T5_Large_GEC_QLoRA")
-
 
 if __name__ == "__main__":
 
