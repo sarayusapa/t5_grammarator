@@ -64,7 +64,8 @@ def main() -> None:
     eval_dataset = ds["validation"]
 
     # (optional small eval)
-    eval_dataset = eval_dataset.select(range(1000))
+    train_dataset = train_dataset.select(range(50000))
+    eval_dataset = eval_dataset.select(range(100))
 
     src_field, tgt_field, tgt_is_list = "wrong", "correct", False
 
@@ -139,12 +140,12 @@ def main() -> None:
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints-LoRA",
-        per_device_train_batch_size=8,
-        per_device_eval_batch_size=2,
-        gradient_accumulation_steps=4,
+        per_device_train_batch_size=32,
+        per_device_eval_batch_size=1,
+        gradient_accumulation_steps=1,
         gradient_checkpointing=True,
         num_train_epochs=2,
-        learning_rate=2.4e-4,
+        learning_rate=2e-4,
         warmup_ratio=0.025,
         save_strategy="steps",
         save_steps=5000,
@@ -152,7 +153,6 @@ def main() -> None:
         eval_steps=3000,
         logging_strategy="steps",
         logging_steps=50,
-        save_total_limit=2,
         optim="adamw_torch",
         dataloader_pin_memory=True,
         predict_with_generate=True,
@@ -176,12 +176,12 @@ def main() -> None:
 
     trainer.train()
 
-    save_dir = "./lora-t5-large-FINAL"
+    save_dir = "./lora-t5-large"
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 
-    trainer.model.push_to_hub("sarayusapa/T5_Large_GEC_LoRA")
-    tokenizer.push_to_hub("sarayusapa/T5_Large_GEC_LoRA")
+    trainer.model.push_to_hub("sarayusapa/lora-test-models")
+    tokenizer.push_to_hub("sarayusapa/lora-test-models")
 
 
 if __name__ == "__main__":
