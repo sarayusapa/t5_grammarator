@@ -20,8 +20,8 @@ import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 
 wandb.init(
-    project="t5-large-lora-final",
-    name="200k-lora-run",
+    project="t5-large-lora-tests",
+    name="50k-lora-run",
 )
 
 def main() -> None:
