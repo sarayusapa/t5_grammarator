@@ -133,11 +133,11 @@ def main() -> None:
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints_FullFT",
-        per_device_train_batch_size=8,
+        per_device_train_batch_size=16,
         per_device_eval_batch_size=2,
-        gradient_accumulation_steps=8,
+        gradient_accumulation_steps=4,
         gradient_checkpointing=True,
-        learning_rate=1.25e-4,
+        learning_rate=1e-4,
         num_train_epochs = 2,
         warmup_ratio=0.05,
         lr_scheduler_type="cosine",
