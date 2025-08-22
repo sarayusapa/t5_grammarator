@@ -138,7 +138,7 @@ def main() -> None:
         gradient_accumulation_steps=4,
         gradient_checkpointing=True,
         learning_rate=1e-4,
-        num_train_epochs = 2,
+        num_train_epochs = 3,
         warmup_ratio=0.02,
         lr_scheduler_type="cosine",
         save_strategy="no",
