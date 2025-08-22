@@ -42,11 +42,11 @@ def main() -> None:
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
 
-    train_dataset = train_dataset.select(range(50000))
+    train_dataset = train_dataset.select(range(10000))
     eval_dataset = eval_dataset.select(range(1000))
 
-    max_source_len = 128
-    max_target_len = 128
+    max_source_len = 64
+    max_target_len = 64
 
     def preprocess_function(examples):
         sources = [f"Grammar Correction: {s}" for s in examples["wrong"]]
@@ -179,11 +179,11 @@ def main() -> None:
     trainer.train()
 
     save_dir = "./t5-large_fullft"
-    trainer.model.save_pretrained(save_dir)
-    tokenizer.save_pretrained(save_dir)
+    # trainer.model.save_pretrained(save_dir)
+    # tokenizer.save_pretrained(save_dir)
 
-    trainer.model.push_to_hub("Hritshhh/T5_Large_Full_FT")
-    tokenizer.push_to_hub("Hritshhh/T5_Large_Full_FT")
+    # trainer.model.push_to_hub("Hritshhh/T5_Large_Full_FT")
+    # tokenizer.push_to_hub("Hritshhh/T5_Large_Full_FT")
 
 if __name__ == "__main__":
     main()
