@@ -140,7 +140,7 @@ def main() -> None:
         learning_rate=1e-4,
         num_train_epochs = 2,
         warmup_ratio=0.02,
-        lr_scheduler_type="linear",
+        lr_scheduler_type="cosine",
         save_strategy="no",
         save_steps=10000,
         save_total_limit=2,
