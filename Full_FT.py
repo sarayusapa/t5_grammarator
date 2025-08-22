@@ -42,7 +42,7 @@ def main() -> None:
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
 
-    train_dataset = train_dataset.select(range(10000))
+    train_dataset = train_dataset.select(range(25000))
     eval_dataset = eval_dataset.select(range(1000))
 
     max_source_len = 64
@@ -139,19 +139,20 @@ def main() -> None:
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints_FullFT",
         per_device_train_batch_size=8,
-        per_device_eval_batch_size=4,
+        per_device_eval_batch_size=2,
         gradient_accumulation_steps=8,
         gradient_checkpointing=True,
         learning_rate=1.25e-4,
+        num_train_epochs = 2,
         warmup_ratio=0.05,
         lr_scheduler_type="cosine",
-        save_strategy="steps",
+        save_strategy="no",
         save_steps=10000,
         save_total_limit=2,
         eval_strategy="steps",
-        eval_steps=10000,
+        eval_steps=200,
         logging_strategy="steps",
-        logging_steps=500,
+        logging_steps=50,
         optim="adamw_torch_fused",
         weight_decay=0.01,
         max_grad_norm=1.0,
