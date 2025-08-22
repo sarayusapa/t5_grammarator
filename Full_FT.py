@@ -42,7 +42,7 @@ def main() -> None:
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
 
-    train_dataset = train_dataset.select(range(25000))
+    train_dataset = train_dataset.select(range(50000))
     eval_dataset = eval_dataset.select(range(1000))
 
     max_source_len = 64
