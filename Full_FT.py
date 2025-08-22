@@ -17,8 +17,8 @@ torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
 
 wandb.init(
-    project="t5-large_full-ft_test",
-    name="t5-large_full-ft_50k_run",
+    project="t5-large_full-ft_final",
+    name="t5-large_full-ft_200k",
 )
 
 def main() -> None:
