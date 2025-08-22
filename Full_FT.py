@@ -145,7 +145,7 @@ def main() -> None:
         save_steps=10000,
         save_total_limit=2,
         eval_strategy="steps",
-        eval_steps=200,
+        eval_steps=2000,
         logging_strategy="steps",
         logging_steps=50,
         optim="adamw_torch_fused",
