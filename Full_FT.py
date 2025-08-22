@@ -111,29 +111,24 @@ def main() -> None:
 
     def compute_metrics(eval_pred):
         predictions, labels = eval_pred
+        if isinstance(predictions, tuple):
+            predictions = predictions[0]
+
+        if torch.is_tensor(predictions):
+            predictions = predictions.cpu().numpy()
+
+        predictions = np.clip(predictions, 0, tokenizer.vocab_size - 1)
         decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
         labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
         decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-
-        bleu = bleu_metric.compute(
-            predictions=[_normalize_text(p) for p in decoded_preds],
-            references=[[ _normalize_text(l) ] for l in decoded_labels],
-        )["bleu"]
-
-        exact_matches = sum(_normalize_text(p) == _normalize_text(l) for p, l in zip(decoded_preds, decoded_labels))
-        accuracy = exact_matches / max(len(decoded_preds), 1)
-
-        precisions, recalls, f1s = [], [], []
-        for p, l in zip(decoded_preds, decoded_labels):
-            pr, rc, f1 = _unigram_overlap_f1(p, l)
-            precisions.append(pr); recalls.append(rc); f1s.append(f1)
-
+        
+        bleu = bleu_metric.compute(predictions=decoded_preds, references=[[l] for l in decoded_labels])
+        print(f"BLEU score: {bleu['bleu']}") 
+        exact_matches = sum(p.strip() == l.strip() for p, l in zip(decoded_preds, decoded_labels))
+        accuracy = exact_matches / len(decoded_preds)
         return {
-            "bleu": float(bleu),
-            "accuracy": float(accuracy),
-            "precision": float(np.mean(precisions)),
-            "recall": float(np.mean(recalls)),
-            "f1": float(np.mean(f1s)),
+            "bleu": bleu["bleu"],
+            "accuracy": accuracy
         }
 
     training_args = Seq2SeqTrainingArguments(
