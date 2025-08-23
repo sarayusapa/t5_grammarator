@@ -1,12 +1,10 @@
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-from peft import PeftModel, PeftConfig, get_peft_model
-import torch
+from huggingface_hub import HfApi, HfFolder, Repository
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-base_model = AutoModelForSeq2SeqLM.from_pretrained("t5-large", torch_dtype=torch.float16)
-model = PeftModel.from_pretrained(base_model, "./qlora-flan-t5-base-lang8")
-model = model.merge_and_unload()
+save_dir = "./t5-large_fullft"
 
-tokenizer = AutoTokenizer.from_pretrained("t5-large")
+model = AutoModelForSeq2SeqLM.from_pretrained(save_dir)
+tokenizer = AutoTokenizer.from_pretrained(save_dir)
 
-model.push_to_hub("sarayusapa/T5_large_QLoRA")
-tokenizer.push_to_hub("sarayusapa/T5_large_QLoRA")
+model.push_to_hub("sarayusapa/T5_large_GEC_FullFT")
+tokenizer.push_to_hub("sarayusapa/T5_large_GEC_FullFT")
