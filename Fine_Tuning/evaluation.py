@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from nltk.translate.gleu_score import corpus_gleu
 from sklearn.metrics import precision_score, recall_score, f1_score
 
-model_name = "sarayusapa/T5_Large_GEC_LoRA"
+model_name = "sarayusapa/T5_Large_GEC_QLoRA"
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to("cuda")
