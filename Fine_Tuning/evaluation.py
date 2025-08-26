@@ -10,8 +10,8 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to("cuda")
 
 df = pd.read_csv("../Test_data/eval_dataset.csv")  
-wrong_sentences = df["wrong"].tolist()
-correct_sentences = df["correct"].tolist()
+wrong_sentences = df["Ungrammatical Statement"].tolist()
+correct_sentences = df["Standard English"].tolist()
 
 def preprocess_function(sources, targets):
     model_inputs = tokenizer(
