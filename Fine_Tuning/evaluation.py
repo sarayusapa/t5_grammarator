@@ -14,7 +14,7 @@ df = pd.read_csv("../Test_data/eval_dataset.csv")
 wrong_sentences = df["Ungrammatical Statement"].tolist()
 correct_sentences = df["Standard English"].tolist()
 
-batch_size = 16  # you can increase if GPU memory allows
+batch_size = 8
 
 predictions = []
 references = []
@@ -32,10 +32,8 @@ for i in range(0, len(wrong_sentences), batch_size):
     predictions.extend(decoded_preds)
     references.extend(batch_targets)
 
-# Compute GLEU
 gleu_score = corpus_gleu([[r.split()] for r in references], [p.split() for p in predictions])
 
-# Precision, Recall, F1
 y_true = [1] * len(references)
 y_pred = [1 if p.strip() == r.strip() else 0 for p, r in zip(predictions, references)]
 
