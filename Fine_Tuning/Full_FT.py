@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 from datasets import load_dataset
 from transformers import (
     AutoTokenizer,
@@ -8,9 +7,7 @@ from transformers import (
     Seq2SeqTrainingArguments,
     DataCollatorForSeq2Seq,
 )
-import evaluate
 import wandb
-from typing import Tuple
 
 torch.cuda.empty_cache()
 torch.backends.cuda.matmul.allow_tf32 = True  
@@ -27,13 +24,11 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(
         model_name,
         use_fast=True,
-        dropout_rate=0.1,
-        attention_dropout_rate=0.1,
     )
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name,torch_dtype=torch.bfloat16,)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name,torch_dtype=torch.bfloat16,device_map="auto")
 
     if hasattr(model, "config"):
         model.config.use_cache = False
@@ -41,8 +36,6 @@ def main() -> None:
     ds = load_dataset("sarayusapa/Grammar_Error_Correction")
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
-
-    # train_dataset = train_dataset.select(range(50000))
     eval_dataset = eval_dataset.select(range(1000))
 
     max_source_len = 64
@@ -89,48 +82,6 @@ def main() -> None:
 
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, label_pad_token_id=-100,pad_to_multiple_of=8)
 
-    bleu_metric = evaluate.load("bleu")
-
-    def _normalize_text(s: str) -> str:
-        return " ".join(s.strip().lower().split())
-
-    def _unigram_overlap_f1(pred: str, gold: str) -> Tuple[float, float, float]:
-        pred_tokens = _normalize_text(pred).split()
-        gold_tokens = _normalize_text(gold).split()
-        if not pred_tokens and not gold_tokens:
-            return 1.0, 1.0, 1.0
-        if not pred_tokens or not gold_tokens:
-            return 0.0, 0.0, 0.0
-        from collections import Counter
-        p_counts, g_counts = Counter(pred_tokens), Counter(gold_tokens)
-        overlap = sum((p_counts & g_counts).values())
-        precision = overlap / max(len(pred_tokens), 1)
-        recall = overlap / max(len(gold_tokens), 1)
-        f1 = 0.0 if precision + recall == 0 else (2 * precision * recall) / (precision + recall)
-        return precision, recall, f1
-
-    def compute_metrics(eval_pred):
-        predictions, labels = eval_pred
-        if isinstance(predictions, tuple):
-            predictions = predictions[0]
-
-        if torch.is_tensor(predictions):
-            predictions = predictions.cpu().numpy()
-
-        predictions = np.clip(predictions, 0, tokenizer.vocab_size - 1)
-        decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
-        labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
-        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-        
-        bleu = bleu_metric.compute(predictions=decoded_preds, references=[[l] for l in decoded_labels])
-        print(f"BLEU score: {bleu['bleu']}") 
-        exact_matches = sum(p.strip() == l.strip() for p, l in zip(decoded_preds, decoded_labels))
-        accuracy = exact_matches / len(decoded_preds)
-        return {
-            "bleu": bleu["bleu"],
-            "accuracy": accuracy
-        }
-
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints_FullFT",
         per_device_train_batch_size=16,
@@ -169,7 +120,6 @@ def main() -> None:
         eval_dataset=tokenized_eval,
         tokenizer=tokenizer,
         data_collator=data_collator,
-        compute_metrics=compute_metrics,
     )
 
     trainer.train()
