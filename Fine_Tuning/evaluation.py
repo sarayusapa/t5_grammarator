@@ -8,55 +8,34 @@ model_name = "sarayusapa/T5_Large_GEC_FULLFT"
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to("cuda")
+model.eval()
 
 df = pd.read_csv("../Test_data/eval_dataset.csv")  
 wrong_sentences = df["Ungrammatical Statement"].tolist()
 correct_sentences = df["Standard English"].tolist()
 
-def preprocess_function(sources, targets):
-    model_inputs = tokenizer(
-        sources,
-        max_length=64,
-        truncation=True,
-        padding="max_length",
-        add_special_tokens=True
-    )
-
-    labels = tokenizer(
-        targets,
-        max_length=64,
-        truncation=True,
-        padding="max_length",
-        add_special_tokens=True
-    )["input_ids"]
-
-    labels = [[(t if t != tokenizer.pad_token_id else -100) for t in lab] for lab in labels]
-    model_inputs["labels"] = labels
-    return model_inputs
-
-tokenized_data = preprocess_function(wrong_sentences, correct_sentences)
+batch_size = 16  # you can increase if GPU memory allows
 
 predictions = []
 references = []
 
-for i in range(len(wrong_sentences)):
-    input_ids = torch.tensor(tokenized_data["input_ids"][i]).unsqueeze(0).to("cuda")
-    attention_mask = torch.tensor(tokenized_data["attention_mask"][i]).unsqueeze(0).to("cuda")
+for i in range(0, len(wrong_sentences), batch_size):
+    batch_sources = wrong_sentences[i:i+batch_size]
+    batch_targets = correct_sentences[i:i+batch_size]
+
+    inputs = tokenizer(batch_sources, return_tensors="pt", padding=True, truncation=True, max_length=64).to("cuda")
 
     with torch.no_grad():
-        outputs = model.generate(input_ids=input_ids, attention_mask=attention_mask, max_length=64)
+        outputs = model.generate(**inputs, max_length=64)
 
-    decoded_pred = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    decoded_label = tokenizer.decode(
-        [t if t != -100 else tokenizer.pad_token_id for t in tokenized_data["labels"][i]],
-        skip_special_tokens=True
-    )
+    decoded_preds = [tokenizer.decode(o, skip_special_tokens=True) for o in outputs]
+    predictions.extend(decoded_preds)
+    references.extend(batch_targets)
 
-    predictions.append(decoded_pred)
-    references.append(decoded_label)
-
+# Compute GLEU
 gleu_score = corpus_gleu([[r.split()] for r in references], [p.split() for p in predictions])
 
+# Precision, Recall, F1
 y_true = [1] * len(references)
 y_pred = [1 if p.strip() == r.strip() else 0 for p, r in zip(predictions, references)]
 
