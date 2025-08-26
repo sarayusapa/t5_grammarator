@@ -1,24 +1,17 @@
 import torch
-from torch.utils.data import DataLoader
-import evaluate
-import numpy as np
 from datasets import load_dataset
 from transformers import (
     AutoTokenizer,
     AutoModelForSeq2SeqLM,
     BitsAndBytesConfig,
-    Trainer,
-    TrainingArguments,
-    default_data_collator,
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments
 )
-
 torch.cuda.empty_cache()
-
 import wandb
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 wandb.init(
     project="t5-large-QL-final", 
@@ -28,8 +21,7 @@ wandb.init(
 def main() -> None:
 
     model_name = "t5-large"
-
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True, dropout_rate=0.1, attention_dropout_rate=0.1)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
@@ -56,20 +48,14 @@ def main() -> None:
         task_type=TaskType.SEQ_2_SEQ_LM,
     )
     model = get_peft_model(model, lora_config)
-    # Disable cache for training to reduce memory and enable checkpointing compatibility
+    
     if hasattr(model, "config"):
         model.config.use_cache = False
 
     ds = load_dataset("sarayusapa/Grammar_Error_Correction")
-
     train_dataset = ds["train"]
     eval_dataset = ds["validation"]
-
-    # train_dataset = train_dataset.select(range(50000))  
     eval_dataset = eval_dataset.select(range(1000))    
-
-    feature_names = set(train_dataset.features.keys())
-    src_field, tgt_field, tgt_is_list = "wrong", "correct", False
 
     def preprocess_function(examples):
         sources = [f"Grammar Correction: {s}" for s in examples["wrong"]]
@@ -102,32 +88,6 @@ def main() -> None:
     print("Number of valid tokens:", sum(t != -100 for t in example_labels))
     
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, label_pad_token_id=-100)
-    print(tokenized_train["labels"][0][:20])
-
-    bleu_metric = evaluate.load("bleu")
-    accuracy = evaluate.load("accuracy")
-    
-    def compute_metrics(eval_pred):
-        predictions, labels = eval_pred
-        if isinstance(predictions, tuple):
-            predictions = predictions[0]
-
-        if torch.is_tensor(predictions):
-            predictions = predictions.cpu().numpy()
-
-        predictions = np.clip(predictions, 0, tokenizer.vocab_size - 1)
-        decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
-        labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
-        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-        
-        bleu = bleu_metric.compute(predictions=decoded_preds, references=[[l] for l in decoded_labels])
-        print(f"BLEU score: {bleu['bleu']}") 
-        exact_matches = sum(p.strip() == l.strip() for p, l in zip(decoded_preds, decoded_labels))
-        accuracy = exact_matches / len(decoded_preds)
-        return {
-            "bleu": bleu["bleu"],
-            "accuracy": accuracy
-        }
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="./ModelCheckpoints-FINAL",
@@ -161,7 +121,6 @@ def main() -> None:
         eval_dataset=tokenized_eval,
         tokenizer=tokenizer,
         data_collator=data_collator,
-        compute_metrics = compute_metrics,
     )
 
     trainer.train()
