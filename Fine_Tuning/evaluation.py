@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import evaluate
+from nltk.translate.gleu_score import corpus_gleu
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 model_name = "sarayusapa/T5_Large_GEC_FULLFT"
@@ -36,8 +36,6 @@ def preprocess_function(sources, targets):
 
 tokenized_data = preprocess_function(wrong_sentences, correct_sentences)
 
-gleu_metric = evaluate.load("gleu")
-
 predictions = []
 references = []
 
@@ -57,7 +55,7 @@ for i in range(len(wrong_sentences)):
     predictions.append(decoded_pred)
     references.append(decoded_label)
 
-gleu_score = gleu_metric.compute(predictions=predictions, references=[[r] for r in references])["gleu"]
+gleu_score = corpus_gleu([[r.split()] for r in references], [p.split() for p in predictions])
 
 y_true = [1] * len(references)
 y_pred = [1 if p.strip() == r.strip() else 0 for p, r in zip(predictions, references)]
