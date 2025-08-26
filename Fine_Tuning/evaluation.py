@@ -9,7 +9,7 @@ model_name = "sarayusapa/T5_Large_GEC_FULLFT"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to("cuda")
 
-df = pd.read_csv("../eval_dataset.csv")  
+df = pd.read_csv("../Test_data/eval_dataset.csv")  
 wrong_sentences = df["wrong"].tolist()
 correct_sentences = df["correct"].tolist()
 
