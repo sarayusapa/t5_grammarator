@@ -14,7 +14,7 @@ df = pd.read_csv("../Test_data/eval_dataset.csv")
 wrong_sentences = df["Ungrammatical Statement"].tolist()
 correct_sentences = df["Standard English"].tolist()
 
-batch_size = 8
+batch_size = 64
 
 predictions = []
 references = []
