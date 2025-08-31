@@ -127,7 +127,7 @@ Full Fine-Tuning uses substantially more GPU memory (around 55% on a 4090) becau
 | ![Full FT](graphs/Screenshot_2025-08-31_225919.png) | ![LoRA](graphs/Screenshot_2025-08-25_145951.png) | ![QLoRA](graphs/Screenshot_2025-08-31_225234.png) |
 
 
-GPU power graph is fairly similar to the utilization graph. so Full’s power draw is high and periodically dips when utilization drops. LoRA shows a noisy power profile as their utilization traces — frequent short kernels and synchronization cause fast power oscillations. Because power responds rapidly to instantaneous load, any fragmentation of work (as in LoRA/QLoRA) looks “spikier” even when the total energy consumed over an epoch is similar.
+Full FT power draw is high and periodically dips when GPU utilization drops. LoRA shows a noisy power profile as their utilization traces frequent short kernels and synchronization cause fast power oscillations. Since power responds rapidly to instantaneous load, any fragmentation of work (as in LoRA/QLoRA) is noisier even when the total energy consumed over an epoch is similar.
 
 ### Training Time
 
