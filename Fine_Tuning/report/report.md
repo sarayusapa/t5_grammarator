@@ -103,7 +103,7 @@ Using Wandb experiment tracking, the training loss graphs for each method are pl
 
 | **Full FT** | **LoRA** | **QLoRA** |
 |-------------|----------|-----------|
-| ![Full FT](Screenshot_2025-08-31_223501.png) | ![LoRA](Screenshot_2025-08-25_145920.png) | ![QLoRA](Screenshot_2025-08-25_151451.png) |
+| ![Full FT](graphs/Screenshot_2025-08-31_223501.png) | ![LoRA](graphs/Screenshot_2025-08-25_145920.png) | ![QLoRA](graphs/Screenshot_2025-08-25_151451.png) |
 
 
 All three methods show a rapid drop initially followed by a steady drop. Full Fine Tuning and LoRA reach a lower loss (<0.3) while QLoRA plateaus above 0.3. This can be justified since quantization in QLoRA introduces relatively noisier gradients due to reduced precision. The lower learning rate in comparison with LoRA fine tuning also explains the higher value of loss after convergence. 
@@ -116,7 +116,7 @@ Using Wandb experiment tracking, the GPU utilization graphs for each method are 
 
 | **Full FT** | **LoRA** | **QLoRA** |
 |-------------|----------|-----------|
-| ![Full FT](Screenshot_2025-08-25_015008.png) | ![LoRA](Screenshot_2025-08-25_015206.png) | ![QLoRA](Screenshot_2025-08-31_225311.png) |
+| ![Full FT](graphs/Screenshot_2025-08-25_015008.png) | ![LoRA](graphs/Screenshot_2025-08-25_015206.png) | ![QLoRA](graphs/Screenshot_2025-08-31_225311.png) |
 
 Full Fine-Tuning uses substantially more GPU memory (around 55% on a 4090) because all model weights, optimizer states, and activation checkpoints are accounted for. LoRA and QLoRA remain near 25% because LoRA freezes most weights and only stores a few adapter parameters, and QLoRA’s low-bit representation further reduces stored weight size. 
 
@@ -124,7 +124,7 @@ Full Fine-Tuning uses substantially more GPU memory (around 55% on a 4090) becau
 
 | **Full FT** | **LoRA** | **QLoRA** |
 |-------------|----------|-----------|
-| ![Full FT](Screenshot_2025-08-31_225919.png) | ![LoRA](Screenshot_2025-08-25_145951.png) | ![QLoRA](Screenshot_2025-08-31_225234.png) |
+| ![Full FT](graphs/Screenshot_2025-08-31_225919.png) | ![LoRA](graphs/Screenshot_2025-08-25_145951.png) | ![QLoRA](graphs/Screenshot_2025-08-31_225234.png) |
 
 
 GPU power graph is fairly similar to the utilization graph. so Full’s power draw is high and periodically dips when utilization drops. LoRA shows a noisy power profile as their utilization traces — frequent short kernels and synchronization cause fast power oscillations. Because power responds rapidly to instantaneous load, any fragmentation of work (as in LoRA/QLoRA) looks “spikier” even when the total energy consumed over an epoch is similar.
