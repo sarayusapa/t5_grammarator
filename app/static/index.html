@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>T5-GRAMMARATOR</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+  <h1>T5-GRAMMARATOR</h1>
+    <h4>Single Sentence</h4>
+    <p>Use the format: Grammar Correction: wrong_sentence</p>
+    <textarea id="singleInput" rows="1" placeholder="Type a sentence..."></textarea>
+    <button onclick="correctSingle()">CORRECT</button>
+    <div id="singleOutput" class="result"></div>
+
+    <h4>Batch Sentences (one per line)</h4>
+    <p>Use the format:</p>
+    <p>Grammar Correction: wrong_sentence 1</p>
+    <p>Grammar Correction: wrong_sentence 2</p>
+    <p>...</p>
+    <textarea id="batchInput" rows="4" placeholder="Type multiple sentences, each on a new line..."></textarea>
+    <button onclick="correctBatch()">CORRECT BATCH</button>
+    <div id="batchOutput" class="result"></div>
+  <script src="/static/script.js"></script>
+</body>
+</html>
