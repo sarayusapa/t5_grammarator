@@ -142,15 +142,15 @@ The context $c_t$ provides the decoder with a weighted combination of encoder st
 
 We built this Neural Network using Pytorch as the deep learning framework and used the MNSIT library for our training and testing datasets.
 
-![NN_accuracy](media/Screenshot_2025-08-21_191135.png)
+![NN_accuracy](media/blog/Screenshot_2025-08-21_191135.png)
 
-![NN_output](media/Screenshot_2025-08-21_192204.png)
+![NN_output](media/blog/Screenshot_2025-08-21_192204.png)
 
 ### LSTM
 
 We built an LSTM that generates Shakespearean style text when given a few words as input. We trained it on a text file containing excerpts from Shakespeare’s plays.
 
-![LSTM](media/image.png)
+![LSTM](media/blog/image.png)
 
 ## Resources
 
@@ -172,11 +172,11 @@ We built an LSTM that generates Shakespearean style text when given a few words 
 
 To start out, we ran our fine tuning on Qwen3 (since it’s a lighter model). Here were the results:
 
-![qwen](media/f1d86d48-3ec3-4e61-929d-b3fefb57dfc9.png)
+![qwen](media/blog/f1d86d48-3ec3-4e61-929d-b3fefb57dfc9.png)
 
 As you may observe, the loss function behaved differently with different values of Hyperparameters. Through trial and error, we got an idea of how to change up the hyperparameters to optimize the loss function.
 
-![t5base](media/8b4789bb-b7f1-4703-a782-d360a321e763.png)
+![t5base](media/blog/8b4789bb-b7f1-4703-a782-d360a321e763.png)
 
 We eventually tuned our HPs for the optimal loss function, as shown. We hence set out to run complete QLoRA finetuning on our model, which would be trained on a 2.9M sentence compiled dataset.
 
@@ -216,19 +216,19 @@ We decided to clean up and scale down the size of the dataset and further change
 
 ## Insights: What we learnt
 
-![full_eval](media/image%201.png)
+![full_eval](media/blog/image%201.png)
 
-![lora_eval](media/image%202.png)
+![lora_eval](media/blog/image%202.png)
 
-![qlora_eval](media/image%203.png)
+![qlora_eval](media/blog/image%203.png)
 
 ## Models in Action
 
-![api_interfact](media/Screenshot_2025-09-02_095638.png)
+![api_interfact](media/blog/Screenshot_2025-09-02_095638.png)
 
 Batched-endpoints fed to FastAPI User Interface.
 
-![final_UI](media/My_Movie_2.gif)
+![final_UI](media/blog/My_Movie_2.gif)
 
 Final working frontend for the model.
 
