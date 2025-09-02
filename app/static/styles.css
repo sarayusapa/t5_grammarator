@@ -1,0 +1,78 @@
+h1 {
+    color: #ffffff;
+    font-size: 3rem;
+    font-weight: bold;
+}
+body {
+    font-family: "Verdana", sans-serif; max-width: 700px;
+    color: #ffffff;
+    margin: 40px auto;
+    background: #161627; 
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #ffffff;
+    box-shadow: 
+    0 0 20px rgba(217, 163, 255, 0.5),  
+    inset 0 0 15px rgba(217, 163, 255, 0.4); 
+}
+p {
+    font-family: "Calibri", sans-serif;
+    padding: 0px;
+    color: #909090;
+    margin: 12px 0;
+    font-size: 0.8rem;
+}
+h4 {
+    color: #ffffff;
+    margin-top: 20px;
+    font-size: 1.2rem;
+}
+textarea, input {
+    background-color: #161627;
+    color: #ffffff;
+    width: 95% ;
+    padding: 12px;
+    margin: 12px 0;
+    border-radius: 8px;
+    border: 2px solid #ffffff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+textarea:focus, input:focus {
+    border-color: #9a74dc;
+    box-shadow: 0 0 20px rgba(155, 131, 201, 0.5);
+    outline: none;
+}
+
+button {
+    font-family: "Calibri", sans-serif;
+    font-size: 1rem;
+    padding: 5px 5px;
+    background: #161627; 
+    border: 3px solid #000000;
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    border: 2px solid #ffffff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    color: rgb(251, 251, 251);
+    background: #371e60; 
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 5px rgba(200, 143, 240, 0.5);
+}
+
+.result {
+    margin-top: 15px;
+    padding: 12px;
+    background: #161627;
+    border: 2px solid #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    font-size: 1rem;
+    line-height: 1.5;
+}
