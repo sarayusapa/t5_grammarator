@@ -4,19 +4,20 @@
 
 # Table of Contents
 
-- About the Project
-    - Tech Stack
-    - File Structure
-- Getting Started
-    - Prerequisites
-    - Installation
-    - Choose Model
-- Usage
-    - Start API Server
-    - Notes
-- Future Work
-- Contributors
-- Acknowledgements and Resources
+- [About the Project](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#about-the-project)
+    - [Tech Stack](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#tech-stack)
+    - [File Structure](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#file-structure)
+    - [Dataset](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#dataset)
+- [Getting Started](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#getting-started)
+    - [Prerequisites](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#prerequisites)
+    - [Installation](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#installation)
+    - [Choose Model](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#choose-model)
+- [Usage](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#usage)
+    - [Start API Server](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#start-api-sserver)
+    - [Notes](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#notes)
+- [Future Work](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#future-work)
+- [Contributors](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#contributors)
+- [Acknowledgements](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#acknowledgements)
 
 # About The Project
 
@@ -159,12 +160,12 @@ We also maintained a [Project Blog](https://github.com/sarayusapa/T5-Grammarator
 - Probing methods to identify how attention heads imbibe grammar rules
 - Finding ways to maximize quantization and maintaining accuracy
 
-## Contributors
+# Contributors
 
 - [Sarayu Anantharaman](https://github.com/sarayusapa)
 - [Hritaansh Mehra](https://github.com/Hritshhh)
 
-## Acknowledgements
+# Acknowledgements
 
 - [SRA VJTI](http://sra.vjti.info/),  Eklavya 2025
 - Special thanks to our mentors, [Rakshitha](https://github.com/RakshithaKowlikar) and [Prithvi](https://github.com/rkt-1597).
