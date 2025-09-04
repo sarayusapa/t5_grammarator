@@ -65,7 +65,28 @@ $$
 
 where $W_q$ denotes the quantized weights. This technique enable the fine-tuning of large models on GPUs with limited memory.
 
----
+## Why LoRA, QLoRA, and Full Fine-Tuning for GEC
+
+GEC as a task calls for precise changes in the sentence while preserving most of its original structure. 
+
+Several fine-tuning methods exist — adapters, prefix tuning, prompt tuning, LoRA, QLoRA, and full fine-tuning. While each has demonstrated success in certain applications, for GEC, LoRA, QLoRA, and Full Fine-Tuning consistently outperform others. 
+
+### Full Fine-Tuning: Maximising Representational Capacity
+
+Full fine-tuning, as mentioned, updates all parameters of the pretrained model. This method helps the model in effectively learning a new function across the entire parameter space, enabling the model to reorganise both high-level semantic knowledge and low-level syntactic sensitivities to optimise for GEC. (balancing pretraining and fine-tuning). For GEC, where grammar rules can involve long-range dependencies, this flexibility is valuable. 
+
+The drawback is that fine-tuning billions of parameters requires substantial compute, memory, and storage. 
+
+### LoRA: Adds Efficiency, Maintains Accuracy
+
+LoRA (Low-Rank Adaptation) addresses the inefficiency of full fine-tuning by restricting parameter updates to a low-rank subspace. Importantly, LoRA injects adapter weight updates   into the **attention layers** of the pretrained model.
+
+This is helpful as grammar errors often depend on attention-based relations between tokens. By modifying the attention matrices directly, LoRA effectively teaches the model to attend differently to different tokens, without needing to rewrite the entire network. 
+
+### QLoRA: Scaling to Larger Models
+
+Training very large base models is computationally expensive. QLoRA extends LoRA by quantizing the base model to 4-bit precision, keeping it frozen, and applying LoRA adapters on top. One might expect this to harm accuracy, but because the **LoRA adapters remain in full precision**, they can compensate for much of the quantization loss. The result is a system that is both memory-efficient and expressive.
+
 
 # Comparing the 3 Methods
 
@@ -103,7 +124,7 @@ Using Wandb experiment tracking, the training loss graphs for each method are pl
 
 | **Full FT** | **LoRA** | **QLoRA** |
 |-------------|----------|-----------|
-| ![Full FT](media/report_graphs/Screenshot_2025-08-31_223501.png) | ![LoRA](media/report_graphs/Screenshot_2025-08-25_145920.png) | ![QLoRA](media/report_graphs/Screenshot_2025-08-25_151451.png) |
+| ![Full FT](media/report/Screenshot_2025-08-31_223501.png) | ![LoRA](media/report/Screenshot_2025-08-25_145920.png) | ![QLoRA](media/report/Screenshot_2025-08-25_151451.png) |
 
 
 All three methods show a rapid drop initially followed by a steady drop. Full Fine Tuning and LoRA reach a lower loss (<0.3) while QLoRA plateaus above 0.3. This can be justified since quantization in QLoRA introduces relatively noisier gradients due to reduced precision. The lower learning rate in comparison with LoRA fine tuning also explains the higher value of loss after convergence. 
@@ -116,7 +137,7 @@ Using Wandb experiment tracking, the GPU utilization graphs for each method are 
 
 | **Full FT** | **LoRA** | **QLoRA** |
 |-------------|----------|-----------|
-| ![Full FT](media/report_graphs/Screenshot_2025-08-25_015008.png) | ![LoRA](media/report_graphs/Screenshot_2025-08-25_015206.png) | ![QLoRA](media/report_graphs/Screenshot_2025-08-31_225311.png) |
+| ![Full FT](media/report/Screenshot_2025-08-25_015008.png) | ![LoRA](media/report/Screenshot_2025-08-25_015206.png) | ![QLoRA](media/report/Screenshot_2025-08-31_225311.png) |
 
 Full Fine-Tuning uses substantially more GPU memory (around 55% on a 4090) because all model weights, optimizer states, and activation checkpoints are accounted for. LoRA and QLoRA remain near 25% because LoRA freezes most weights and only stores a few adapter parameters, and QLoRA’s low-bit representation further reduces stored weight size. 
 
@@ -124,7 +145,7 @@ Full Fine-Tuning uses substantially more GPU memory (around 55% on a 4090) becau
 
 | **Full FT** | **LoRA** | **QLoRA** |
 |-------------|----------|-----------|
-| ![Full FT](media/report_graphs/Screenshot_2025-08-31_225919.png) | ![LoRA](media/report_graphs/Screenshot_2025-08-25_145951.png) | ![QLoRA](media/report_graphs/Screenshot_2025-08-31_225234.png) |
+| ![Full FT](media/report/Screenshot_2025-08-31_225919.png) | ![LoRA](media/report/Screenshot_2025-08-25_145951.png) | ![QLoRA](media/report/Screenshot_2025-08-31_225234.png) |
 
 
 Full FT power draw is high and periodically dips when GPU utilization drops. LoRA shows a noisy power profile as their utilization traces frequent short kernels and synchronization cause fast power oscillations. Since power responds rapidly to instantaneous load, any fragmentation of work (as in LoRA/QLoRA) is noisier even when the total energy consumed over an epoch is similar.
@@ -136,6 +157,24 @@ Full FT power draw is high and periodically dips when GPU utilization drops. LoR
 | 2.5 hours | 1.5 hours | 1.5 hours |
 
 LoRA and QLoRA update only a small set of adapter parameters (LoRA) or using lower-precision kernels (QLoRA) reducing per-step compute time. This yields faster steps and fewer stalls. Full parameter training performs larger forward and and backward passes, increasing step time and aggregate training time. 
+
+## Evaluation Metrics
+| **Full FT** | **LoRA** | **QLoRA** |
+|-------------|----------|-----------|
+| ![full_eval](media/blog/image%201.png) | ![lora_eval](media/blog/image%202.png)| ![qlora_eval](media/blog/image%203.png)|
+
+The evaluation metrics for the LoRA- and QLoRA fine-tuned models indicate that both approaches achieved strong and comparable performance. The consistently high precision across both suggests that the models are conservative in their corrections.. This behavior aligns with the design of low-rank adaptation methods, which tend to preserve the pretrained model’s linguistic knowledge while selectively adjusting attention mechanisms.
+The recall values, reflect the models’ relative restraint in applying corrections. This is a common pattern in GEC systems, where recall is often the trade-off against maintaining high precision. The small difference in GLEU and F1 between LoRA and QLoRA is expected.
+This verifies that QLoRA  preserves the effectiveness of LoRA while reducing resource requirements, validating QLoRA as a practical alternative for large-scale GEC fine-tuning when computational efficiency is a priority, without sacrificing significant performance.
+
+The full Fine-Tuning evaluation metrics however, are poorer than expected.
+### Learnings From Full Fine-Tuning Evaluation
+
+During fine-tuning, Start-of-Sequence (SOS) and End-of-Sequence (EOS) tokens were not incorporated into the training process. As a result, the full fine-tuned model occasionally produced outputs that were either incomplete (starting midway through a sentence) or redundant (repeating the corrected sentence multiple times). These irregularities affected the evaluation phase in particular, since the generated outputs diverged structurally from the references ,thereby skewing evaluation metrics.
+
+It is important to note, however, that the model produced coherent and stable corrections in practical inference scenarios, and the frontend user interface built on top of the model has been functioning well. The discrepancy was thus confined only to evaluation.
+
+The key takeaway is that including SOS and EOS tokens are essential in future fine-tuning runs, to ensure both evaluation metrics and model outputs remain consistent and reliable across training, inference, and deployment.
 
 ## Example-wise Comparison of the 3 Methods
 

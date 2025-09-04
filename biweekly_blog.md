@@ -12,7 +12,7 @@ The goal of this project is to fine tune Google’s T5 Transformer to perform GE
 - Completed assignments as part of the course, practically applied what we learned.
 - Browsed through a few datasets for fine tuning and shortlisted a few.
 
-## Insights: What we learnt
+## Insights & Learnings
 
 ### Neural Networks
 
@@ -91,7 +91,7 @@ External parameters set before training (not learned by the model) that control 
 - Studied the research paper on T5 and attention
 - Finalised the datasets we will use for Fine Tuning
 
-## Insights: What we learnt
+## Insights & Learnings
 
 ### Sequence Models
 
@@ -168,7 +168,7 @@ We built an LSTM that generates Shakespearean style text when given a few words 
 - Started with test runs with QLoRA finetuning.
 - Played around with Hyperparameter values to observe how the loss function changes.
 
-## Insights: What we learnt
+## Insights & Learnings
 
 To start out, we ran our fine tuning on Qwen3 (since it’s a lighter model). Here were the results:
 
@@ -214,13 +214,14 @@ We decided to clean up and scale down the size of the dataset and further change
 - Linked the API with a frontend
 - Wrote a [comparison report](https://github.com/sarayusapa/T5-Grammarator/blob/main/report/report.md) on the three Fine Tuning methods, comparing accuracy, efficiency, etc.
 
-## Insights: What we learnt
+## Insights & Learnings
 
-![full_eval](media/blog/image%201.png)
-
-![lora_eval](media/blog/image%202.png)
-
-![qlora_eval](media/blog/image%203.png)
+| **Full FT** | **LoRA** | **QLoRA** |
+|-------------|----------|-----------|
+| ![full_eval](media/blog/image%201.png) | ![lora_eval](media/blog/image%202.png)| ![qlora_eval](media/blog/image%203.png)|
+As shown, the evaluation scores for Full Fine Tuning are poorer than expected.
+### Learnings
+The full FT evaluation scores were lower than expected because SOS and EOS tokens were missing in training. This caused word jumbling and repetition, especially during evaluation. This however did not affect any results while running singular inference or even a few batches, while deploying the model.
 
 ## Models in Action
 
