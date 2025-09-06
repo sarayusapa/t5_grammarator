@@ -56,11 +56,11 @@ https://bekushal.medium.com/cleaned-lang8-dataset-for-grammar-error-detection-79
 ├─ report.md
 ├─ README.md
 ```
-# Reports & Documentation
+## Reports & Documentation
 
 View the [Comparison Report](https://github.com/sarayusapa/t5_grammarator/tree/main/report.md) analysing the performance of Full Fine-Tuning, LoRA, and QLoRA across parameters like efficiency, memory usage, and accuracy.
 
-We also maintained a [Project Blog](https://github.com/sarayusapa/t5_grammarator/tree/main/biweekly_blog.md) to document workflow, progress, results and decisions.
+We also maintained a detailed [Project Blog](https://github.com/sarayusapa/t5_grammarator/tree/main/biweekly_blog.md) to document workflow, progress, results and decisions made over the course of the project.
 
 # Getting Started
 
