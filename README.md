@@ -31,10 +31,10 @@ This project provides a FastAPI-based service for Grammar Error Correction (GEC)
 - Programming Language: Python
 - Deep Learning Framework: PyTorch
 - Data Processing and Handling: Numpy, Pandas
-- **Model:** Hugging Face Transformers
-- **Optimization:** Optimum, ONNX Runtime
-- **Backend:** FastAPI, Uvicorn
-- **Frontend:** HTML, CSS, JS
+- Model: Hugging Face Transformers
+- Optimization: Optimum, ONNX Runtime
+- Backend: FastAPI, Uvicorn
+- Frontend: HTML, CSS, JS
 
 ## Dataset
 
@@ -80,7 +80,7 @@ git clone https://github.com/sarayusapa/T5-Grammarator.git
 Navigate to the following directory:
 
 ```bash
-cd T5-Grammarator/app
+cd T5-Grammarator/app/
 ```
 
 You can run either the **Full Fine-Tuned model** or the **Adapter-based models (LoRA / QLoRA)**, depending on your preference.
@@ -117,7 +117,7 @@ ADAPTER_PATH = "sarayusapa/T5_Large_GEC_LoRA"  #LoRA
 
 ## Start API Server
 
-In the app/ directory, run the command:
+In the same directory ("T5-Grammarator/app"), run the command:
 
 ```bash
 uvicorn t5app:app --reload
@@ -134,7 +134,7 @@ After this, the server will be available to open and use.
 
 View the [Comparison Report](https://github.com/sarayusapa/T5-Grammarator/tree/main/report.md) analysing the performance of Full Fine-Tuning, LoRA, and QLoRA across parameters like efficiency, memory usage, and accuracy.
 
-We also maintained a [Project Blog](https://github.com/sarayusapa/T5-Grammarator/tree/main/biweekly_blog.md) to document workflow, progress, and decisions.
+We also maintained a [Project Blog](https://github.com/sarayusapa/T5-Grammarator/tree/main/biweekly_blog.md) to document workflow, progress, results and decisions.
 
 # Future Work
 
