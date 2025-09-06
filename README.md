@@ -47,30 +47,11 @@ https://bekushal.medium.com/cleaned-lang8-dataset-for-grammar-error-detection-79
 ## File Structure
 
 ```
-├─ app/
-│  ├─ convertmodel.py
-│  ├─ t5app.py
-│  └─ static/
-│     ├─ index.html
-│     ├─ script.js
-│     └─ styles.css
-├─ digit_recognition_nn/
-│  └─ Digit_recognition_NN.ipynb
-├─ fine_tuning/
-│  ├─ Full_FT.py
-│  ├─ LoRA.py
-│  ├─ QLoRA.py
-│  └─ evaluation.py
-└─ shakespeare_textgen/
-│   ├─ DATA/
-│   ├─ LICENSE
-│   ├─ ShakespeareText.py
-│   ├─ lossfunc.png
-│   ├─ output.png
-│   └─ preprocess.py
-├─ media/
-│  ├─ blog/
-│  └─ report_graphs/
+├─ app/                             # files for deployment and web app
+├─ digit_recognition_nn/            # NN implementation code
+├─ fine_tuning/                     # fine-tuning and evaluation code
+└─ shakespeare_textgen/             # LSTM implementation code
+├─ media/                           # images used in readme, report, blog
 ├─ biweekly_blog.md
 ├─ report.md
 ├─ README.md

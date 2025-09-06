@@ -149,7 +149,7 @@ We built this Neural Network using Pytorch as the deep learning framework and us
 ### LSTM
 
 We built an LSTM that generates Shakespearean style text when given a few words as input. We trained it on a text file containing excerpts from Shakespeare’s plays.
-
+![Loss](media/blog/lossfunc.png)
 ![LSTM](media/blog/image.png)
 
 ## Resources
