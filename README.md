@@ -4,21 +4,21 @@
 
 # Table of Contents
 
-- [About the Project](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#about-the-project)
-    - [Tech Stack](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#tech-stack)
-    - [Dataset](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#dataset)
-    - [File Structure](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#file-structure)
-- [Getting Started](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#getting-started)
-    - [Prerequisites](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#prerequisites)
-    - [Installation](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#installation)
-    - [Choose Model](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#choose-model)
-- [Usage](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#usage)
-    - [Start API Server](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#start-api-server)
-    - [Notes](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#notes)
-- [Reports & Documentation](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#reports--documentation)
-- [Future Work](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#future-work)
-- [Contributors](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#contributors)
-- [Acknowledgements](https://github.com/sarayusapa/T5-Grammarator/blob/main/README.md#acknowledgements)
+- [About the Project](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#about-the-project)
+    - [Tech Stack](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#tech-stack)
+    - [Dataset](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#dataset)
+    - [File Structure](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#file-structure)
+- [Getting Started](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#getting-started)
+    - [Prerequisites](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#prerequisites)
+    - [Installation](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#installation)
+    - [Choose Model](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#choose-model)
+- [Usage](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#usage)
+    - [Start API Server](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#start-api-server)
+    - [Notes](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#notes)
+- [Reports & Documentation](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#reports--documentation)
+- [Future Work](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#future-work)
+- [Contributors](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#contributors)
+- [Acknowledgements](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#acknowledgements)
 
 # About The Project
 
@@ -56,6 +56,11 @@ https://bekushal.medium.com/cleaned-lang8-dataset-for-grammar-error-detection-79
 ├─ report.md
 ├─ README.md
 ```
+# Reports & Documentation
+
+View the [Comparison Report](https://github.com/sarayusapa/t5_grammarator/tree/main/report.md) analysing the performance of Full Fine-Tuning, LoRA, and QLoRA across parameters like efficiency, memory usage, and accuracy.
+
+We also maintained a [Project Blog](https://github.com/sarayusapa/t5_grammarator/tree/main/biweekly_blog.md) to document workflow, progress, results and decisions.
 
 # Getting Started
 
@@ -72,7 +77,7 @@ pip install transformers optimum[onnxruntime] torch fastapi uvicorn
 Clone the repository
 
 ```bash
-git clone https://github.com/sarayusapa/T5-Grammarator.git
+git clone https://github.com/sarayusapa/t5_Grammarator.git
 ```
 
 ## Choose Model
@@ -80,7 +85,7 @@ git clone https://github.com/sarayusapa/T5-Grammarator.git
 Navigate to the following directory:
 
 ```bash
-cd T5-Grammarator/app/
+cd t5_Grammarator/app/
 ```
 
 You can run either the **Full Fine-Tuned model** or the **Adapter-based models (LoRA / QLoRA)**, depending on your preference.
@@ -117,7 +122,7 @@ ADAPTER_PATH = "sarayusapa/T5_Large_GEC_LoRA"  #LoRA
 
 ## Start API Server
 
-In the same directory ("T5-Grammarator/app"), run the command:
+In the same directory ("t5_Grammarator/app"), run the command:
 
 ```bash
 uvicorn t5app:app --reload
@@ -130,11 +135,6 @@ After this, the server will be available to open and use.
 - Use **Full FT model** if you want the most accurate results.
 - Use **Adapters (LoRA/QLoRA)** if you want lightweight and memory-efficient inference.
 
-# Reports & Documentation
-
-View the [Comparison Report](https://github.com/sarayusapa/T5-Grammarator/tree/main/report.md) analysing the performance of Full Fine-Tuning, LoRA, and QLoRA across parameters like efficiency, memory usage, and accuracy.
-
-We also maintained a [Project Blog](https://github.com/sarayusapa/T5-Grammarator/tree/main/biweekly_blog.md) to document workflow, progress, results and decisions.
 
 # Future Work
 
