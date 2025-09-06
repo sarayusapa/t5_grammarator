@@ -94,8 +94,8 @@ LoRA, QLoRA and Full Fine Tuning methods applied on Google’s T5-large transfor
 
 ## Trainable Parameters
 
-Full FT: 770M (T5 Large)
-LoRA: 8-10M (rank=8)
+*Full FT: 770M (T5 Large)*  
+*LoRA: 8-10M (rank=8)*  
 Empirical results from the LoRA and QLoRA method studies show that **r=8 provides a strong balance. It operates on** only around 1% trainable parameters of T5-Large while still nearly matching full fine-tuning performance across many NLP benchmarks.
 
 ## Learning Rate
