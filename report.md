@@ -171,7 +171,13 @@ The full Fine-Tuning evaluation metrics however, are poorer than expected.
 ### Learnings From Full Fine-Tuning Evaluation
 
 During fine-tuning, Start-of-Sequence (SOS) and End-of-Sequence (EOS) tokens were not incorporated into the training process. As a result, the full fine-tuned model occasionally produced outputs that were either incomplete (starting midway through a sentence) or redundant (repeating the corrected sentence multiple times). These irregularities affected the evaluation phase in particular, since the generated outputs diverged structurally from the references ,thereby skewing evaluation metrics.
+Example Case for Demonstration:
 
+| Wrong Sentence | QLoRA/LoRA | Full Fine Tuning |
+| --- | --- | --- |
+|The informations which the researchers publishes in the journal was contains errors. | The information which the researchers published in the journal contains many errors. | researchers publish in the journal contains many errors the information. | 
+
+As observed, the model performs the targetted grammar correction but the sequence of tokens in input and output is mismatched.
 It is important to note, however, that the model produced coherent and stable corrections in practical inference scenarios, and the frontend user interface built on top of the model has been functioning well. The discrepancy was thus confined only to evaluation.
 
 The key takeaway is that including SOS and EOS tokens are essential in future fine-tuning runs, to ensure both evaluation metrics and model outputs remain consistent and reliable across training, inference, and deployment.
