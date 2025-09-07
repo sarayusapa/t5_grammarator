@@ -170,12 +170,12 @@ We built an LSTM that generates Shakespearean style text when given a few words 
 
 ## Insights & Learnings
 
-To start out, we ran our fine tuning on Qwen3 (since it’s a lighter model). Here were the results:
-
+To start out, we ran our fine tuning on Qwen2-0.5b (since it’s a lighter model). 
 ![qwen](media/blog/f1d86d48-3ec3-4e61-929d-b3fefb57dfc9.png)
 
 As you may observe, the loss function behaved differently with different values of Hyperparameters. Through trial and error, we got an idea of how to change up the hyperparameters to optimize the loss function.
 
+We then switched to flan t5 and t5 base for test runs.
 ![t5base](media/blog/8b4789bb-b7f1-4703-a782-d360a321e763.png)
 
 We eventually tuned our HPs for the optimal loss function, as shown. We hence set out to run complete QLoRA finetuning on our model, which would be trained on a 2.9M sentence compiled dataset.
