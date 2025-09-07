@@ -2,12 +2,16 @@
 
 **Fine-tuning Google’s T5 for Grammatical Error Correction (GEC) in sentences.**
 
+![My Movie 2.gif](media/blog/My_Movie_2.gif)
+
+This project provides a FastAPI-based service for Grammar Error Correction (GEC) using fine-tuned T5 models. We applied three different fine-tuning approaches (LoRA, QLoRA, and Full fine-tuning) and evaluate each method’s effectiveness in terms of performance, efficiency, and time and resource requirements.
 # Table of Contents
 
-- [About the Project](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#about-the-project)
-    - [Tech Stack](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#tech-stack)
-    - [Dataset](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#dataset)
-    - [File Structure](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#file-structure)
+-  [Tech Stack](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#tech-stack)
+- [Dataset](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#dataset)
+-  [File Structure](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#file-structure)
+- [Reports & Documentation](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#reports--documentation)
+- [Evaluation Metrics](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#evaluation-metrics)
 - [Getting Started](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#getting-started)
     - [Prerequisites](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#prerequisites)
     - [Installation](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#installation)
@@ -15,18 +19,12 @@
 - [Usage](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#usage)
     - [Start API Server](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#start-api-server)
     - [Notes](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#notes)
-- [Reports & Documentation](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#reports--documentation)
 - [Future Work](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#future-work)
 - [Contributors](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#contributors)
 - [Acknowledgements](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#acknowledgements)
 
-# About The Project
 
-![My Movie 2.gif](media/blog/My_Movie_2.gif)
-
-This project provides a FastAPI-based service for Grammar Error Correction (GEC) using fine-tuned T5 models. We applied three different fine-tuning approaches (LoRA, QLoRA, and Full fine-tuning) and evaluate each method’s effectiveness in terms of performance, efficiency, and time and resource requirements.
-
-## Tech Stack
+# Tech Stack
 
 - Programming Language: Python
 - Deep Learning Framework: PyTorch
@@ -36,7 +34,7 @@ This project provides a FastAPI-based service for Grammar Error Correction (GEC)
 - Backend: FastAPI, Uvicorn
 - Frontend: HTML, CSS, JS
 
-## Dataset
+# Dataset
 
 We used a [Custom HF Dataset](https://huggingface.co/datasets/sarayusapa/Grammar_Error_Correction) of 200k sentence pairs which is a compilation of the following 2 datasets:
 
@@ -44,7 +42,7 @@ https://www.kaggle.com/datasets/satishgunjal/grammar-correction
 
 https://bekushal.medium.com/cleaned-lang8-dataset-for-grammar-error-detection-79aaa31150aa
 
-## File Structure
+# File Structure
 
 ```
 ├─ app/                             # files for deployment and web app
@@ -58,13 +56,13 @@ https://bekushal.medium.com/cleaned-lang8-dataset-for-grammar-error-detection-79
 ```
 
 The evaluation in detail has been documented in the Comparison report
-## Reports & Documentation
+# Reports & Documentation
 
 View the [Comparison Report](https://github.com/sarayusapa/t5_grammarator/tree/main/report.md) analysing the performance of Full Fine-Tuning, LoRA, and QLoRA across parameters like efficiency, memory usage, and accuracy.
 
 We also maintained a detailed [Project Blog](https://github.com/sarayusapa/t5_grammarator/tree/main/biweekly_blog.md) to document workflow, progress, results and decisions made over the course of the project.
 
-## Evaluation Metrics
+# Evaluation Metrics
 
 We evaluated the 3 models using the following metrics:
 - GLEU Score
