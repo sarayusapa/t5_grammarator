@@ -12,7 +12,7 @@ The goal of this project is to fine tune Google’s T5 Transformer to perform GE
 - Completed assignments as part of the course, practically applied what we learned.
 - Browsed through a few datasets for fine tuning and shortlisted a few.
 
-## Insights: What we learnt
+## Insights & Learnings
 
 ### Neural Networks
 
@@ -91,7 +91,7 @@ External parameters set before training (not learned by the model) that control 
 - Studied the research paper on T5 and attention
 - Finalised the datasets we will use for Fine Tuning
 
-## Insights: What we learnt
+## Insights & Learnings
 
 ### Sequence Models
 
@@ -149,7 +149,7 @@ We built this Neural Network using Pytorch as the deep learning framework and us
 ### LSTM
 
 We built an LSTM that generates Shakespearean style text when given a few words as input. We trained it on a text file containing excerpts from Shakespeare’s plays.
-
+![Loss](media/blog/lossfunc.png)
 ![LSTM](media/blog/image.png)
 
 ## Resources
@@ -168,14 +168,14 @@ We built an LSTM that generates Shakespearean style text when given a few words 
 - Started with test runs with QLoRA finetuning.
 - Played around with Hyperparameter values to observe how the loss function changes.
 
-## Insights: What we learnt
+## Insights & Learnings
 
-To start out, we ran our fine tuning on Qwen3 (since it’s a lighter model). Here were the results:
-
+To start out, we ran our fine tuning on Qwen2-0.5b (since it’s a lighter model). 
 ![qwen](media/blog/f1d86d48-3ec3-4e61-929d-b3fefb57dfc9.png)
 
 As you may observe, the loss function behaved differently with different values of Hyperparameters. Through trial and error, we got an idea of how to change up the hyperparameters to optimize the loss function.
 
+We then switched to flan t5 and t5 base for test runs.
 ![t5base](media/blog/8b4789bb-b7f1-4703-a782-d360a321e763.png)
 
 We eventually tuned our HPs for the optimal loss function, as shown. We hence set out to run complete QLoRA finetuning on our model, which would be trained on a 2.9M sentence compiled dataset.
@@ -214,13 +214,14 @@ We decided to clean up and scale down the size of the dataset and further change
 - Linked the API with a frontend
 - Wrote a [comparison report](https://github.com/sarayusapa/T5-Grammarator/blob/main/report/report.md) on the three Fine Tuning methods, comparing accuracy, efficiency, etc.
 
-## Insights: What we learnt
+## Insights & Learnings
 
-![full_eval](media/blog/image%201.png)
-
-![lora_eval](media/blog/image%202.png)
-
-![qlora_eval](media/blog/image%203.png)
+| **Full FT** | **LoRA** | **QLoRA** |
+|-------------|----------|-----------|
+| ![full_eval](media/blog/image%201.png) | ![lora_eval](media/blog/image%202.png)| ![qlora_eval](media/blog/image%203.png)|
+As shown, the evaluation scores for Full Fine Tuning are poorer than expected.
+### Learnings
+The full FT evaluation scores were lower than expected because SOS and EOS tokens were missing in training. This caused word jumbling and repetition, especially during evaluation. This however did not affect any results while running singular inference or even a few batches, while deploying the model.
 
 ## Models in Action
 
