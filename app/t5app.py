@@ -31,15 +31,29 @@ class BatchInput(BaseModel):
 
 @app.post("/predict")
 def predict(data: SingleInput):
-    inputs = tokenizer(data.text, return_tensors="pt")
-    outputs = model.generate(**inputs)
+    inputs = tokenizer(data.text, return_tensors="pt", truncation=True, max_length=512)
+    outputs = model.generate(
+        **inputs,
+        max_length=512,   
+        early_stopping=True,
+        num_beams=4,       
+        length_penalty=1.0, 
+        no_repeat_ngram_size=3 
+    )
     corrected = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return {"output": corrected}
 
 @app.post("/predict_batch")
 def predict_batch(data: BatchInput):
-    inputs = tokenizer(data.texts, return_tensors="pt", padding=True, truncation=True)
-    outputs = model.generate(**inputs)
+    inputs = tokenizer(data.texts, return_tensors="pt", padding=True, truncation=True, max_length=512)
+    outputs = model.generate(
+        **inputs,
+        max_length=512,
+        early_stopping=True,
+        num_beams=4,
+        length_penalty=1.0,
+        no_repeat_ngram_size=3
+    )
     corrected = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     return {"outputs": corrected}
 
