@@ -144,9 +144,9 @@ After this, the server will be available to open and use.
 
 # Contributors
 
-- [Sarayu Anantharaman](https://github.com/sarayusapa)
 - [Hritaansh Mehra](https://github.com/Hritshhh)
-
+- [Sarayu Anantharaman](https://github.com/sarayusapa)
+ 
 # Acknowledgements
 
 - [SRA VJTI](http://sra.vjti.info/),  Eklavya 2025
