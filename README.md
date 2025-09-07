@@ -71,6 +71,7 @@ We evaluated the 3 models using the following metrics:
 - Precision
 - F1
 - Recall
+
 We also used WandB experiment tracking to track losses, CPU/GPU usage, etc. The detailed graph and evaluation inferences can be found in the Comparison Report.
 
 # Getting Started
