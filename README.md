@@ -2,9 +2,12 @@
 
 **Fine-tuning Google’s T5 for Grammatical Error Correction (GEC) in sentences.**
 
-![My Movie 2.gif](media/blog/My_Movie_2.gif)
 
+<p align="center">
+  <img src="media/blog/My_Movie_2.gif" width="500" />
+</p>
 This project provides a FastAPI-based service for Grammar Error Correction (GEC) using fine-tuned T5 models. We applied three different fine-tuning approaches (LoRA, QLoRA, and Full fine-tuning) and evaluate each method’s effectiveness in terms of performance, efficiency, and time and resource requirements.
+
 # Table of Contents
 
 -  [Tech Stack](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#tech-stack)
