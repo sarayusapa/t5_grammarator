@@ -23,8 +23,6 @@ This project provides a FastAPI-based service for Grammar Error Correction (GEC)
     - [Start API Server](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#start-api-server)
     - [Notes](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#notes)
 - [Future Work](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#future-work)
-- [Contributors](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#contributors)
-- [Acknowledgements](https://github.com/sarayusapa/t5_Grammarator/blob/main/README.md#acknowledgements)
 
 
 # Tech Stack
@@ -154,13 +152,3 @@ After this, the server will be available to open and use.
 - Reinforcement Learning based fine-tuning for GEC+reasoning
 - Probing methods to identify how attention heads imbibe grammar rules
 - Finding ways to maximize quantization and maintaining accuracy
-
-# Contributors
-
-- [Hritaansh Mehra](https://github.com/Hritshhh)
-- [Sarayu Anantharaman](https://github.com/sarayusapa)
- 
-# Acknowledgements
-
-- [SRA VJTI](http://sra.vjti.info/),  Eklavya 2025
-- Special thanks to our mentors, [Rakshitha](https://github.com/RakshithaKowlikar) and [Prithvi](https://github.com/rkt-1597).
