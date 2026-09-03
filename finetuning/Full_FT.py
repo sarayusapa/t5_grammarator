@@ -128,8 +128,8 @@ def main() -> None:
     trainer.model.save_pretrained(save_dir)
     tokenizer.save_pretrained(save_dir)
 
-    trainer.model.push_to_hub("Hritshhh/T5_Large_Full_FT")
-    tokenizer.push_to_hub("Hritshhh/T5_Large_Full_FT")
+    trainer.model.push_to_hub("sarayusapa/T5_large_GEC_FullFT")
+    tokenizer.push_to_hub("sarayusapa/T5_large_GEC_FullFT")
 
 if __name__ == "__main__":
     main()

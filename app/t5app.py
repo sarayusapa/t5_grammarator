@@ -31,7 +31,7 @@ class BatchInput(BaseModel):
 
 @app.post("/predict")
 def predict(data: SingleInput):
-    inputs = tokenizer(data.text, return_tensors="pt", truncation=True, max_length=512)
+    inputs = tokenizer(f"Grammar Correction: {data.text}", return_tensors="pt", truncation=True, max_length=512)
     outputs = model.generate(
         **inputs,
         max_length=512,   
@@ -45,7 +45,10 @@ def predict(data: SingleInput):
 
 @app.post("/predict_batch")
 def predict_batch(data: BatchInput):
-    inputs = tokenizer(data.texts, return_tensors="pt", padding=True, truncation=True, max_length=512)
+    inputs = tokenizer(
+        [f"Grammar Correction: {t}" for t in data.texts],
+        return_tensors="pt", padding=True, truncation=True, max_length=512,
+    )
     outputs = model.generate(
         **inputs,
         max_length=512,
