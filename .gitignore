@@ -1,0 +1,5 @@
+.DS_Store
+finetuning/benchmark/data/
+finetuning/benchmark/predictions/
+finetuning/benchmark/results.jsonl
+Test_data/
